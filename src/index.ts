@@ -1,17 +1,32 @@
 import { MikroORM } from "@mikro-orm/core";
 import { __prod__ } from "./constants";
-import { Book } from "./entities/Book";
 import mikroOrmConfig from "./mikro-orm.config";
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import { HelloResolver } from "./resolvers/hello";
+import { BookResolver } from "./resolvers/book";
 
 const main = async () => {
   const orm = await MikroORM.init(mikroOrmConfig);
   await orm.getMigrator().up();
   const emFork = orm.em.fork();
-  // const book = emFork.create(Book, { title: "It", author: "Stephen King" });
-  // await emFork.persistAndFlush(book);
+  const app = express();
 
-  const books = await emFork.find(Book, {});
-  console.log(books);
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [HelloResolver, BookResolver],
+      validate: false,
+    }),
+    context: () => ({ emFork: emFork }),
+  });
+
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+
+  app.listen(4000, () => {
+    console.log("server started on localhost:4000");
+  });
 };
 
 main().catch((err) => {
