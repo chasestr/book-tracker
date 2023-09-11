@@ -1,7 +1,6 @@
 import path from "path";
 import { __prod__ } from "./constants";
 import { MikroORM } from "@mikro-orm/postgresql";
-import { Book } from "./entities/Book";
 import { configDotenv } from "dotenv";
 configDotenv();
 
@@ -11,7 +10,7 @@ export default {
   type: "postgresql",
   user: process.env.DBUser,
   password: process.env.DBPass,
-  entities: [Book],
+  entities: [path.join(__dirname, "./entities")],
   migrations: {
     path: path.join(__dirname, "./migrations"),
     glob: "!(*.d).{js,ts}",
