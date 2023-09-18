@@ -6,6 +6,7 @@ import {
   Field,
   Ctx,
   ObjectType,
+  Query,
 } from "type-graphql";
 import { MyContext } from "../types";
 import argon2 from "argon2";
@@ -38,10 +39,20 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async currentUser(@Ctx() { emFork, req }: MyContext) {
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const user = await emFork.findOne(User, { id: req.session.userId });
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { emFork }: MyContext
+    @Ctx() { emFork, req }: MyContext
   ): Promise<UserResponse> {
     if (options.username.length <= 2) {
       return {
@@ -74,20 +85,26 @@ export class UserResolver {
     } catch (err) {
       if (err.code === "23505") {
         return {
-            errors: [{
-                field: "username",
-                message: "Username has already been taken"
-            }]
-        }
+          errors: [
+            {
+              field: "username",
+              message: "Username has already been taken",
+            },
+          ],
+        };
       }
     }
+
+    //log user in after registering
+    req.session.userId = user.id;
+
     return { user };
   }
 
   @Mutation(() => UserResponse)
   async login(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { emFork }: MyContext
+    @Ctx() { emFork, req }: MyContext
   ): Promise<UserResponse> {
     const user = await emFork.findOne(User, { username: options.username });
     if (!user) {
@@ -111,6 +128,9 @@ export class UserResolver {
         ],
       };
     }
+
+    //set user cookie to store user session
+    req.session.userId = user.id;
 
     return {
       user,
