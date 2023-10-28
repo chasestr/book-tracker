@@ -1,0 +1,10 @@
+query Books {
+  books {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    publisher
+  }
+}
