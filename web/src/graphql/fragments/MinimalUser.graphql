@@ -1,0 +1,4 @@
+fragment MinimalUser on User {
+    id
+    username
+}

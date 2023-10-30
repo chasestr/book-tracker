@@ -1,0 +1,8 @@
+fragment MinimalUserResponse on UserResponse {
+  errors {
+    ...MinimalError
+  }
+  user {
+    ...MinimalUser
+  }
+}
