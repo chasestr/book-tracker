@@ -1,0 +1,4 @@
+fragment MinimalError on FieldError {
+    field
+    message
+}
