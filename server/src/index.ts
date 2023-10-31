@@ -1,22 +1,31 @@
-import { MikroORM } from "@mikro-orm/core";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
 import { BookResolver } from "./resolvers/book";
 import { UserResolver } from "./resolvers/user";
 import RedisStore from "connect-redis";
 import session from "express-session";
 import { Redis } from "ioredis";
 import { getEnv } from "./config";
-import cors from "cors";
+import { DataSource } from "typeorm";
+import "reflect-metadata";
+import { Book } from "./entities/Book";
+import { User } from "./entities/User";
+
+export const ds = new DataSource({
+  type: "postgres",
+  database: getEnv("DBName2"),
+  username: getEnv("DBUser"),
+  password: getEnv("DBPass"),
+  logging: !__prod__,
+  synchronize: true,
+  entities: [Book, User],
+  port: parseInt(getEnv("DBPort")),
+});
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  await orm.getMigrator().up();
-  const emFork = orm.em.fork();
+  await ds.initialize();
   const app = express();
 
   const redisClient = new Redis({ lazyConnect: true });
@@ -26,13 +35,6 @@ const main = async () => {
     client: redisClient,
     disableTouch: true,
   });
-
-  app.use(
-    cors({
-      origin: "http://localhost:3000",
-      credentials: true,
-    })
-  );
 
   app.use(
     session({
@@ -45,18 +47,17 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 265 * 10,
         httpOnly: true,
         secure: __prod__,
-        sameSite: "lax",
+        sameSite: __prod__ ? "lax" : "none",
       },
     })
   );
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, BookResolver, UserResolver],
+      resolvers: [BookResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({
-      emFork: emFork,
       req,
       res,
       redisClient,
@@ -66,7 +67,10 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: false,
+    cors: {
+      origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+      credentials: true,
+    },
   });
 
   app.listen(4000, () => {
