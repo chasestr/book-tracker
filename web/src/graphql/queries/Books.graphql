@@ -1,10 +1,23 @@
-query Books {
-  books {
-    id
-    createdAt
-    updatedAt
-    title
-    author
-    publisher
+query Books($limit: Int!, $cursor: String) {
+  books(cursor: $cursor, limit: $limit) {
+    books {
+      id
+      createdAt
+      updatedAt
+      title
+      author
+      publisher
+      pages
+      startDate
+      finishDate
+      notes
+      summary
+      genre
+      rating
+      userId
+      __typename
+    }
+    hasMore
+    __typename
   }
 }
