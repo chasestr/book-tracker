@@ -15,16 +15,38 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTimeISO: { input: any; output: any; }
 };
 
 export type Book = {
   __typename?: 'Book';
   author: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
-  id: Scalars['Float']['output'];
+  finishDate?: Maybe<Scalars['DateTimeISO']['output']>;
+  genre?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  pages?: Maybe<Scalars['Float']['output']>;
   publisher?: Maybe<Scalars['String']['output']>;
+  rating?: Maybe<Scalars['Float']['output']>;
+  startDate?: Maybe<Scalars['DateTimeISO']['output']>;
+  summary?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
+  userId: Scalars['Float']['output'];
+};
+
+export type BookInput = {
+  author: Scalars['String']['input'];
+  finishDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  genre?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  pages?: InputMaybe<Scalars['Float']['input']>;
+  publisher?: InputMaybe<Scalars['String']['input']>;
+  rating?: InputMaybe<Scalars['Float']['input']>;
+  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  summary?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type FieldError = {
@@ -53,8 +75,7 @@ export type MutationChangePasswordArgs = {
 
 
 export type MutationCreateBookArgs = {
-  author: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  input: BookInput;
 };
 
 
@@ -84,17 +105,28 @@ export type MutationUpdateBookTitleArgs = {
   title: Scalars['String']['input'];
 };
 
+export type PaginatedBooks = {
+  __typename?: 'PaginatedBooks';
+  books: Array<Book>;
+  hasMore: Scalars['Boolean']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   book?: Maybe<Book>;
-  books: Array<Book>;
+  books: PaginatedBooks;
   currentUser?: Maybe<User>;
-  hello: Scalars['String']['output'];
 };
 
 
 export type QueryBookArgs = {
   bookId: Scalars['Float']['input'];
+};
+
+
+export type QueryBooksArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
 };
 
 export type User = {
@@ -132,6 +164,13 @@ export type ChangePasswordMutationVariables = Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string } | null } };
 
+export type CreateBookMutationVariables = Exact<{
+  input: BookInput;
+}>;
+
+
+export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, userId: number } };
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String']['input'];
 }>;
@@ -159,10 +198,13 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string } | null } };
 
-export type BooksQueryVariables = Exact<{ [key: string]: never; }>;
+export type BooksQueryVariables = Exact<{
+  limit: Scalars['Int']['input'];
+  cursor?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 
-export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, publisher?: string | null }> };
+export type BooksQuery = { __typename?: 'Query', books: { __typename: 'PaginatedBooks', hasMore: boolean, books: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number }> } };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -202,6 +244,22 @@ export const ChangePasswordDocument = gql`
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const CreateBookDocument = gql`
+    mutation CreateBook($input: BookInput!) {
+  createBook(input: $input) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    userId
+  }
+}
+    `;
+
+export function useCreateBookMutation() {
+  return Urql.useMutation<CreateBookMutation, CreateBookMutationVariables>(CreateBookDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
@@ -244,19 +302,31 @@ export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
 export const BooksDocument = gql`
-    query Books {
-  books {
-    id
-    createdAt
-    updatedAt
-    title
-    author
-    publisher
+    query Books($limit: Int!, $cursor: String) {
+  books(cursor: $cursor, limit: $limit) {
+    books {
+      id
+      createdAt
+      updatedAt
+      title
+      author
+      publisher
+      pages
+      startDate
+      finishDate
+      notes
+      summary
+      genre
+      rating
+      userId
+    }
+    hasMore
+    __typename
   }
 }
     `;
 
-export function useBooksQuery(options?: Omit<Urql.UseQueryArgs<BooksQueryVariables>, 'query'>) {
+export function useBooksQuery(options: Omit<Urql.UseQueryArgs<BooksQueryVariables>, 'query'>) {
   return Urql.useQuery<BooksQuery, BooksQueryVariables>({ query: BooksDocument, ...options });
 };
 export const CurrentUserDocument = gql`
