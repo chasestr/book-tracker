@@ -1,0 +1,25 @@
+.card {
+  border: 1px solid #b40e0e;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #ffffff7a;
+  transition: transform 0.2s;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+}
+
+.card p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.card:hover {
+  transform: scale(1.1);
+}
