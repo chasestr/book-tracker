@@ -1,17 +1,19 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { User } from "./User";
 
 @ObjectType()
 @Entity()
 export class Book extends BaseEntity {
-  @Field()
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -34,4 +36,39 @@ export class Book extends BaseEntity {
   @Field({ nullable: true })
   @Column({ nullable: true })
   publisher?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  pages?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  startDate?: Date;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  finishDate?: Date;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  notes?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  summary?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  genre?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  rating?: number;
+
+  @Field()
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.books)
+  user: User;
 }
