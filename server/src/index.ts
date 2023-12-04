@@ -12,14 +12,16 @@ import { DataSource } from "typeorm";
 import "reflect-metadata";
 import { Book } from "./entities/Book";
 import { User } from "./entities/User";
+import path from "path";
 
 export const ds = new DataSource({
   type: "postgres",
-  database: getEnv("DBName2"),
+  database: getEnv("DBName"),
   username: getEnv("DBUser"),
   password: getEnv("DBPass"),
   logging: !__prod__,
   synchronize: true,
+  migrations: [path.join(__dirname, "./migrations/*")],
   entities: [Book, User],
   port: parseInt(getEnv("DBPort")),
 });
@@ -27,6 +29,7 @@ export const ds = new DataSource({
 const main = async () => {
   await ds.initialize();
   const app = express();
+  ds.runMigrations();
 
   const redisClient = new Redis({ lazyConnect: true });
   redisClient.connect().catch(console.error);
@@ -47,7 +50,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 265 * 10,
         httpOnly: true,
         secure: __prod__,
-        sameSite: __prod__ ? "lax" : "none",
+        sameSite: "lax",
       },
     })
   );
