@@ -2,8 +2,10 @@ import { Box, Button, Center, Flex } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useCurrentUserQuery, useLogoutMutation } from "../generated/graphql";
+import { useRouter } from "next/router";
 
 export const Navbar: React.FC<{}> = () => {
+  const router = useRouter();
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useCurrentUserQuery();
   if (fetching) {
@@ -39,8 +41,9 @@ export const Navbar: React.FC<{}> = () => {
           </Center>
           <Button
             color="aqua"
-            onClick={() => {
-              logout({});
+            onClick={async () => {
+              await logout({});
+              router.reload();
             }}
             isLoading={logoutFetching}
           >

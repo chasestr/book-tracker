@@ -1,5 +1,5 @@
 import { Exchange, fetchExchange, stringifyVariables } from "urql";
-import { Resolver, cacheExchange } from "@urql/exchange-graphcache";
+import { Cache, Resolver, cacheExchange } from "@urql/exchange-graphcache";
 import {
   LogoutMutation,
   CurrentUserQuery,
@@ -23,7 +23,6 @@ const errorExchange: Exchange =
           error?.message?.includes("Not authenticated") &&
           typeof window !== "undefined"
         ) {
-          console.log("hit" + error.message);
           Router.replace("/login");
         }
       })
@@ -65,6 +64,14 @@ const cursorPagination = (): Resolver => {
   };
 };
 
+const invalidateAllBooks = (cache: Cache) => {
+  const allFields = cache.inspectFields("Query");
+  const fieldInfos = allFields.filter((info) => info.fieldName === "books");
+  fieldInfos.forEach((fi) => {
+    cache.invalidate("Query", "books", fi.arguments);
+  });
+};
+
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
   let cookie = "";
   if (isServer()) {
@@ -99,13 +106,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               });
             },
             createBook: (_result, _args, cache, _info) => {
-              const allFields = cache.inspectFields("Query");
-              const fieldInfos = allFields.filter(
-                (info) => info.fieldName === "books"
-              );
-              fieldInfos.forEach((fi) => {
-                cache.invalidate("Query", "books", fi.arguments);
-              });
+              invalidateAllBooks(cache);
             },
             logout: (_result, _args, cache, _info) => {
               updateQuery<LogoutMutation, CurrentUserQuery>(
@@ -130,6 +131,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                   }
                 }
               );
+              invalidateAllBooks(cache);
             },
             register: (_result, _args, cache, _info) => {
               updateQuery<RegisterMutation, CurrentUserQuery>(
