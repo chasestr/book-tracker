@@ -36,9 +36,9 @@ const Index = () => {
         <div>Loading...</div>
       ) : (
         <Box display={"flex"} flexWrap={"wrap"} p={4}>
-          {data?.books.books.map((b) => (
-            <BookCard book={b} key={b.id}></BookCard>
-          ))}
+          {data?.books.books.map((b) =>
+            !b ? null : <BookCard book={b} key={b.id}></BookCard>
+          )}
         </Box>
       )}
       {data && data.books.hasMore ? (
