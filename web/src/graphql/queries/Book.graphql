@@ -1,0 +1,18 @@
+query Book($id: Int!) {
+  book(id: $id) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    publisher
+    pages
+    startDate
+    finishDate
+    notes
+    summary
+    genre
+    rating
+    userId
+  }
+}
