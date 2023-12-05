@@ -11,8 +11,8 @@ export const Navbar: React.FC<{}> = () => {
   }
   if (!data?.currentUser) {
     return (
-      <Flex bg="chakra-subtle-bg._light" p={4}>
-        <Box ml="auto">
+      <Flex p={4} position={"sticky"} top={0} bg={"darkblue"}>
+        <Box ml="auto" maxW={800}>
           <NextLink href="/login" passHref>
             <Button mr={2} color="aqua">
               Login
@@ -26,22 +26,27 @@ export const Navbar: React.FC<{}> = () => {
     );
   }
   return (
-    <Flex bg="chakra-subtle-bg._light" p={4}>
-      <Flex ml="auto">
-        <Center>
-          <Box mr={2} color="aqua">
-            {data.currentUser.username}
-          </Box>
-        </Center>
-        <Button
-          color="aqua"
-          onClick={() => {
-            logout({});
-          }}
-          isLoading={logoutFetching}
-        >
-          Logout
-        </Button>
+    <Flex p={4} position={"sticky"} top={0} bg={"darkblue"}>
+      <Flex flex={1} m="auto" align="center" maxW={800} px={4}>
+        <NextLink href="/" passHref>
+          <Button color="aqua">Home</Button>
+        </NextLink>
+        <Flex ml="auto">
+          <Center>
+            <Box mr={2} color="aqua">
+              {data.currentUser.username}
+            </Box>
+          </Center>
+          <Button
+            color="aqua"
+            onClick={() => {
+              logout({});
+            }}
+            isLoading={logoutFetching}
+          >
+            Logout
+          </Button>
+        </Flex>
       </Flex>
     </Flex>
   );
