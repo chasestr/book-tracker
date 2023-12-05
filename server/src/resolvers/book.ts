@@ -10,10 +10,13 @@ import {
   UseMiddleware,
   Int,
   ObjectType,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { authenticate } from "../middleware/authentication";
 import { ds } from "..";
+import { User } from "../entities/User";
 
 @InputType()
 export class BookInput {
@@ -47,9 +50,14 @@ export class PaginatedBooks {
   hasMore: boolean;
 }
 
-@Resolver()
+@Resolver(Book)
 export class BookResolver {
-  // @UseMiddleware(authenticate)
+  @FieldResolver(() => User)
+  user(@Root() book: Book, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(book.userId);
+  }
+
+  @UseMiddleware(authenticate)
   @Query(() => PaginatedBooks)
   async books(
     @Arg("limit", () => Int) limit: number,
@@ -59,7 +67,7 @@ export class BookResolver {
     const realLimit = Math.min(100, limit);
     const qb = ds
       .getRepository(Book)
-      .createQueryBuilder("p")
+      .createQueryBuilder()
       .where('"userId" = :id', { id: req.session.userId })
       .orderBy('"title"', "ASC")
       .take(realLimit + 1);
@@ -76,7 +84,7 @@ export class BookResolver {
   }
 
   @Query(() => Book, { nullable: true })
-  book(@Arg("bookId") id: number): Promise<Book | null> {
+  book(@Arg("id", () => Int) id: number): Promise<Book | null> {
     return Book.findOne({
       where: {
         id,
@@ -96,25 +104,41 @@ export class BookResolver {
     }).save();
   }
 
+  //determine how to update an entire record based
+  //on whatever fields the user has modified
+  //Maybe just use a state on the book page for editing/not editing?
   @Mutation(() => Book, { nullable: true })
-  async updateBookTitle(
-    @Arg("id") id: number,
-    @Arg("title") title: string
+  @UseMiddleware(authenticate)
+  async updateBook(
+    @Ctx() { req }: MyContext,
+    @Arg("id", () => Int) id: number,
+    @Arg("title", { nullable: true }) title: string
   ): Promise<Book | null> {
-    const book = await Book.findOne({ where: { id } });
-    if (!book) {
-      return null;
-    }
-    if (typeof title !== "undefined") {
-      book.title = title;
-      Book.update({ id }, { title });
-    }
-    return book;
+    const book = await ds
+      .getRepository(Book)
+      .createQueryBuilder()
+      .update(Book)
+      .set({ title }) //figure out how to set all available/modified
+      .where('id = :id and "userId" = :userId', {
+        id,
+        userId: req.session.userId,
+      })
+      .returning("*")
+      .execute();
+
+    return book.raw[0];
   }
 
   @Mutation(() => Boolean)
-  async deleteBook(@Arg("id") id: number): Promise<boolean> {
-    const deleted = await Book.delete({ id });
+  @UseMiddleware(authenticate)
+  async deleteBook(
+    @Arg("id", () => Int) id: number,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+    const deleted = await Book.delete({
+      id,
+      userId: req.session.userId,
+    });
     if (!deleted) {
       return false;
     }

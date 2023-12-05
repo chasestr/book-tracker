@@ -13,6 +13,7 @@ import "reflect-metadata";
 import { Book } from "./entities/Book";
 import { User } from "./entities/User";
 import path from "path";
+import { createUserLoader } from "./dataloaders/User";
 
 export const ds = new DataSource({
   type: "postgres",
@@ -64,6 +65,7 @@ const main = async () => {
       req,
       res,
       redisClient,
+      userLoader: createUserLoader(),
     }),
   });
 
