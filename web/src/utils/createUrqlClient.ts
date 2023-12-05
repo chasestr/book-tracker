@@ -6,6 +6,7 @@ import {
   CurrentUserDocument,
   LoginMutation,
   RegisterMutation,
+  DeleteBookMutationVariables,
 } from "../generated/graphql";
 import { updateQuery } from "./updateQuery";
 import { pipe, tap } from "wonka";
@@ -67,7 +68,7 @@ const cursorPagination = (): Resolver => {
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
   let cookie = "";
   if (isServer()) {
-    cookie = ctx.req.headers.cookie;
+    cookie = ctx?.req?.headers?.cookie;
   }
   return {
     url: "http://localhost:4000/graphql",
@@ -91,6 +92,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
         updates: {
           Mutation: {
+            deleteBook: (_result, args, cache, _info) => {
+              cache.invalidate({
+                __typename: "Book",
+                id: (args as DeleteBookMutationVariables).id,
+              });
+            },
             createBook: (_result, _args, cache, _info) => {
               const allFields = cache.inspectFields("Query");
               const fieldInfos = allFields.filter(
