@@ -35,7 +35,7 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
           icon={<EditIcon />}
           aria-label="Edit book"
           onClick={() => {
-            router.push(`/book/edit/[${p.book.id}]`);
+            router.push(`/book/edit/${p.book.id}`);
           }}
         />
       </div>

@@ -40,10 +40,20 @@ export const CreateBook: React.FC<{}> = ({}) => {
         {({ isSubmitting }) => (
           <Form>
             <Box>
-              <InputField name="title" placeholder="Title" label="Title" />
+              <InputField
+                name="title"
+                placeholder="Title"
+                label="Title"
+                required={true}
+              />
             </Box>
             <Box>
-              <InputField name="author" placeholder="Author" label="Author" />
+              <InputField
+                name="author"
+                placeholder="Author"
+                label="Author"
+                required={true}
+              />
             </Box>
             <Box>
               <InputField
@@ -57,6 +67,7 @@ export const CreateBook: React.FC<{}> = ({}) => {
                 name="pages"
                 placeholder="Pages"
                 label="Number of Pages"
+                type="number"
               />
             </Box>
             <Box>
@@ -64,6 +75,7 @@ export const CreateBook: React.FC<{}> = ({}) => {
                 name="startDate"
                 placeholder="Start Date"
                 label="Start Date"
+                type="date"
               />
             </Box>
             <Box>
@@ -71,6 +83,7 @@ export const CreateBook: React.FC<{}> = ({}) => {
                 name="finishDate"
                 placeholder="Finish Date"
                 label="Finish Date"
+                type="date"
               />
             </Box>
             <Box>
@@ -91,6 +104,7 @@ export const CreateBook: React.FC<{}> = ({}) => {
                 name="rating"
                 placeholder="Rating 1-10"
                 label="Rating"
+                type="number"
               />
             </Box>
             <Flex mt={4}>

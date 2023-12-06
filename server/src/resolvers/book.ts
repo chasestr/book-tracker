@@ -29,9 +29,9 @@ export class BookInput {
   @Field({ nullable: true })
   pages?: number;
   @Field({ nullable: true })
-  startDate?: Date;
+  startDate?: string;
   @Field({ nullable: true })
-  finishDate?: Date;
+  finishDate?: string;
   @Field({ nullable: true })
   notes?: string;
   @Field({ nullable: true })
