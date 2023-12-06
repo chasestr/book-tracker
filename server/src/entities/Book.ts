@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -69,6 +70,8 @@ export class Book extends BaseEntity {
   @Column()
   userId: number;
 
+  @Field()
   @ManyToOne(() => User, (user) => user.books)
+  @JoinColumn({ name: "userId" })
   user: User;
 }

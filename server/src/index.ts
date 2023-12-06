@@ -17,14 +17,10 @@ import { createUserLoader } from "./dataloaders/User";
 
 export const ds = new DataSource({
   type: "postgres",
-  database: getEnv("DBName"),
-  username: getEnv("DBUser"),
-  password: getEnv("DBPass"),
+  url: getEnv("DATABASE_URL"),
   logging: !__prod__,
-  synchronize: true,
   migrations: [path.join(__dirname, "./migrations/*")],
   entities: [Book, User],
-  port: parseInt(getEnv("DBPort")),
 });
 
 const main = async () => {
@@ -32,7 +28,7 @@ const main = async () => {
   const app = express();
   ds.runMigrations();
 
-  const redisClient = new Redis({ lazyConnect: true });
+  const redisClient = new Redis(getEnv("REDIS_URL"));
   redisClient.connect().catch(console.error);
 
   const redisStore = new (RedisStore as any)({
@@ -40,6 +36,7 @@ const main = async () => {
     disableTouch: true,
   });
 
+  app.set("trust proxy", 1);
   app.use(
     session({
       name: COOKIE_NAME,
@@ -52,6 +49,7 @@ const main = async () => {
         httpOnly: true,
         secure: __prod__,
         sameSite: "lax",
+        domain: __prod__ ? ".story-stash.com" : undefined,
       },
     })
   );
@@ -73,13 +71,13 @@ const main = async () => {
   apolloServer.applyMiddleware({
     app,
     cors: {
-      origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+      origin: getEnv("CORS_ORIGIN").split(", "),
       credentials: true,
     },
   });
 
-  app.listen(4000, () => {
-    console.log("server started on localhost:4000");
+  app.listen(parseInt(getEnv("PORT")), () => {
+    console.log(`server started on ${getEnv("PORT")}`);
   });
 };
 
