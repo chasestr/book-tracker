@@ -1,5 +1,3 @@
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../../utils/createUrqlClient";
 import { useRouter } from "next/router";
 import { PageWrapper } from "../../../components/PageWrapper";
 import {
@@ -13,14 +11,15 @@ const EditBook = ({}) => {
     typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
 
   //   const [, updateBook] = useUpdateBookMutation();
-  const [{ data, fetching, error }] = useBookQuery({
-    pause: intId === -1,
+  const { data, loading, error } = useBookQuery({
+    skip: intId === -1,
     variables: {
       id: intId,
     },
+    ssr: false,
   });
 
-  if (fetching) {
+  if (loading) {
     return (
       <PageWrapper>
         <div>Loading...</div>
@@ -49,4 +48,4 @@ const EditBook = ({}) => {
   return <div>Hello</div>;
 };
 
-export default withUrqlClient(createUrqlClient)(EditBook);
+export default EditBook;

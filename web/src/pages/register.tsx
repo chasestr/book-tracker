@@ -3,21 +3,34 @@ import React from "react";
 import { PageWrapper } from "../components/PageWrapper";
 import { InputField } from "../components/InputField";
 import { Box, Button } from "@chakra-ui/react";
-import { useRegisterMutation } from "../generated/graphql";
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+  useRegisterMutation,
+} from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 
-export const register: React.FC<{}> = () => {
+const Register = () => {
   const router = useRouter();
-  const [{}, register] = useRegisterMutation();
+  const [register, {}] = useRegisterMutation();
   return (
     <PageWrapper variant="small">
       <Formik
         initialValues={{ username: "", email: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register({ options: values });
+          const response = await register({
+            variables: { options: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: "Query",
+                  currentUser: data?.register.user,
+                },
+              });
+            },
+          });
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else if (response.data?.register.user) {
@@ -53,4 +66,4 @@ export const register: React.FC<{}> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(register);
+export default Register;

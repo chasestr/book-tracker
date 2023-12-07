@@ -3,29 +3,43 @@ import React from "react";
 import { PageWrapper } from "../components/PageWrapper";
 import { InputField } from "../components/InputField";
 import { Box, Button, Flex } from "@chakra-ui/react";
-import { useLoginMutation } from "../generated/graphql";
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+  useLoginMutation,
+} from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
 
-export const login: React.FC<{}> = () => {
+const Login = () => {
   const router = useRouter();
-  const [{}, login] = useLoginMutation();
+  const [login, {}] = useLoginMutation();
   return (
     <PageWrapper variant="small">
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await login(values);
+          const response = await login({
+            variables: values,
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: "Query",
+                  currentUser: data?.login.user,
+                },
+              });
+              cache.evict({ fieldName: "books:{}" });
+            },
+          });
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             if (typeof router.query.next === "string") {
               router.push(router.query.next);
             } else {
-              router.push("/")
+              router.push("/");
             }
           }
         }}
@@ -62,4 +76,4 @@ export const login: React.FC<{}> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(login);
+export default Login;

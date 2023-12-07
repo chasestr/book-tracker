@@ -1,5 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import React from "react";
+import { Navbar } from "./Navbar";
 
 interface PageWrapperProps {
   readonly children?: React.ReactNode;
@@ -11,6 +12,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   variant = "regular",
 }) => {
   return (
+    <>
+    <Navbar />
     <Box
       mt={8}
       mx="auto"
@@ -19,5 +22,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
     >
       {children}
     </Box>
+    </>
   );
 };

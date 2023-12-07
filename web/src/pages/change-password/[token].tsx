@@ -7,13 +7,15 @@ import { useRouter } from "next/router";
 import { InputField } from "../../components/InputField";
 import { PageWrapper } from "../../components/PageWrapper";
 import { toErrorMap } from "../../utils/toErrorMap";
-import { useChangePasswordMutation } from "../../generated/graphql";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../utils/createUrqlClient";
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+  useChangePasswordMutation,
+} from "../../generated/graphql";
 
 export const ChangePassword: NextPage<{ token: string }> = () => {
   const router = useRouter();
-  const [{}, changePassword] = useChangePasswordMutation();
+  const [changePassword, {}] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
   return (
     <PageWrapper variant="small">
@@ -21,9 +23,23 @@ export const ChangePassword: NextPage<{ token: string }> = () => {
         initialValues={{ newPassword: "" }}
         onSubmit={async (values, { setErrors }) => {
           const response = await changePassword({
-            newPassword: values.newPassword,
-            token:
-              typeof router.query.token === "string" ? router.query.token : "",
+            variables: {
+              newPassword: values.newPassword,
+              token:
+                typeof router.query.token === "string"
+                  ? router.query.token
+                  : "",
+            },
+            update: (cache, { data }) => {
+              cache.writeQuery<CurrentUserQuery>({
+                query: CurrentUserDocument,
+                data: {
+                  __typename: "Query",
+                  currentUser: data?.changePassword.user,
+                },
+              });
+              cache.evict({ fieldName: "books:{}" });
+            },
           });
           if (response.data?.changePassword.errors) {
             const errorMap = toErrorMap(response.data.changePassword.errors);
@@ -64,4 +80,4 @@ export const ChangePassword: NextPage<{ token: string }> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(ChangePassword);
+export default ChangePassword;

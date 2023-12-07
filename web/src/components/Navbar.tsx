@@ -2,13 +2,13 @@ import { Box, Button, Center, Flex } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useCurrentUserQuery, useLogoutMutation } from "../generated/graphql";
-import { useRouter } from "next/router";
+import { useApolloClient } from "@apollo/client";
 
 export const Navbar: React.FC<{}> = () => {
-  const router = useRouter();
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useCurrentUserQuery();
-  if (fetching) {
+  const apolloClient = useApolloClient();
+  const [logout, { loading: logoutFetching }] = useLogoutMutation();
+  const { data, loading } = useCurrentUserQuery();
+  if (loading) {
     //loading user login
   }
   if (!data?.currentUser) {
@@ -43,7 +43,7 @@ export const Navbar: React.FC<{}> = () => {
             color="aqua"
             onClick={async () => {
               await logout({});
-              router.reload();
+              await apolloClient.resetStore();
             }}
             isLoading={logoutFetching}
           >

@@ -1,5 +1,3 @@
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useRouter } from "next/router";
 import { useBookQuery } from "../../generated/graphql";
 import { PageWrapper } from "../../components/PageWrapper";
@@ -9,13 +7,14 @@ export const Book = ({}) => {
   const router = useRouter();
   const intId =
     typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
-  const [{ data, fetching, error }] = useBookQuery({
-    pause: intId === -1,
+  const { data, loading, error } = useBookQuery({
+    skip: intId === -1,
     variables: {
       id: intId,
     },
+    ssr: false,
   });
-  if (fetching) {
+  if (loading) {
     return (
       <PageWrapper>
         <div>Loading...</div>
@@ -47,4 +46,4 @@ export const Book = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Book);
+export default Book;

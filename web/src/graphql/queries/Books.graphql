@@ -1,5 +1,6 @@
 query Books($limit: Int!, $cursor: String) {
   books(cursor: $cursor, limit: $limit) {
+    hasMore
     books {
       id
       createdAt
@@ -15,9 +16,6 @@ query Books($limit: Int!, $cursor: String) {
       genre
       rating
       userId
-      __typename
     }
-    hasMore
-    __typename
   }
 }

@@ -1,22 +1,26 @@
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import { useBooksQuery } from "../generated/graphql";
 import { PageWrapper } from "../components/PageWrapper";
 import { BookCard } from "../components/book-card/card";
 import { Box, Button, Flex, Heading } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useState } from "react";
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 10,
-    cursor: null as null | string,
+  const { data, loading, fetchMore, variables } = useBooksQuery({
+    variables: {
+      limit: 10,
+      cursor: null,
+    },
+    notifyOnNetworkStatusChange: true,
   });
-  const [{ data, fetching }] = useBooksQuery({ variables });
 
-  if (!fetching && !data) {
-    return <div>No data to show</div>;
+  if (!loading && !data) {
+    return (
+      <PageWrapper>
+        <div>No data to show</div>
+      </PageWrapper>
+    );
   }
+
   return (
     <PageWrapper>
       <Flex
@@ -32,7 +36,7 @@ const Index = () => {
           </Button>
         </NextLink>
       </Flex>
-      {fetching && !data ? (
+      {loading && !data ? (
         <div>Loading...</div>
       ) : (
         <Box display={"flex"} flexWrap={"wrap"} p={4}>
@@ -44,16 +48,18 @@ const Index = () => {
       {data && data.books.hasMore ? (
         <Flex>
           <Button
-            onClick={() =>
-              setVariables({
-                limit: variables.limit,
-                cursor: data.books.books[data.books.books.length - 1].title,
-              })
-            }
+            onClick={() => {
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor: data.books.books[data.books.books.length - 1].title,
+                },
+              });
+            }}
             color="teal"
             m="auto"
             my={4}
-            isLoading={fetching}
+            isLoading={loading}
           >
             Load More
           </Button>
@@ -63,4 +69,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Index);
+export default Index;

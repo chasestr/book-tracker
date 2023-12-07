@@ -7,14 +7,12 @@ import { PageWrapper } from "../components/PageWrapper";
 import { TextareaField } from "../components/TextareaField";
 import { useCreateBookMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import { isLoggedIn } from "../utils/isLoggedIn";
 
 export const CreateBook: React.FC<{}> = ({}) => {
   const router = useRouter();
   isLoggedIn();
-  const [, createBook] = useCreateBookMutation();
+  const [createBook, {}] = useCreateBookMutation();
   return (
     <PageWrapper variant="small">
       <Formik
@@ -31,8 +29,13 @@ export const CreateBook: React.FC<{}> = ({}) => {
           rating: undefined,
         }}
         onSubmit={async (values) => {
-          const { error } = await createBook({ input: values });
-          if (!error) {
+          const { errors } = await createBook({
+            variables: { input: values },
+            update: (cache) => {
+              cache.evict({ fieldName: "books:{}" });
+            },
+          });
+          if (!errors) {
             router.push("/");
           }
         }}
@@ -119,4 +122,4 @@ export const CreateBook: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(CreateBook);
+export default CreateBook;

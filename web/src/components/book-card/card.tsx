@@ -1,4 +1,4 @@
-import { IconButton, Link } from "@chakra-ui/react";
+import { Button, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { Book, useDeleteBookMutation } from "../../generated/graphql";
 import styles from "./card.module.css";
@@ -10,16 +10,16 @@ type BookCardProps = {
 };
 
 export const BookCard: React.FC<BookCardProps> = (p) => {
-  const [, deleteBook] = useDeleteBookMutation();
+  const [deleteBook, {}] = useDeleteBookMutation();
   const router = useRouter();
 
   return (
     <div className={styles.card}>
       <div className="card-body">
         <NextLink href="/book/[id]" as={`/book/${p.book.id}`}>
-          <Link>
+          <Button>
             <h2>{p.book.title}</h2>
-          </Link>
+          </Button>
         </NextLink>
         <p>{p.book.author?.slice(0, 50)}</p>
         {p.book.genre ? <p>Genre: {p.book.genre.slice(0, 50)}</p> : null}
@@ -28,7 +28,12 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
           icon={<DeleteIcon color="red" />}
           aria-label="Delete book"
           onClick={() => {
-            deleteBook({ id: p.book.id });
+            deleteBook({
+              variables: { id: p.book.id },
+              update: (cache) => {
+                cache.evict({ id: "Book:" + p.book.id });
+              },
+            });
           }}
         />
         <IconButton
