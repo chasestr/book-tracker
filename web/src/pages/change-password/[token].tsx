@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NextPage } from "next";
 import NextLink from "next/link";
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import { Box, Flex, Link } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import { useRouter } from "next/router";
 import { InputField } from "../../components/InputField";
@@ -12,6 +12,7 @@ import {
   CurrentUserQuery,
   useChangePasswordMutation,
 } from "../../generated/graphql";
+import StandardButton from "../../components/base/StandardButton";
 
 export const ChangePassword: NextPage<{ token: string }> = () => {
   const router = useRouter();
@@ -70,9 +71,9 @@ export const ChangePassword: NextPage<{ token: string }> = () => {
                 </NextLink>
               </Flex>
             ) : null}
-            <Button mt={4} type="submit" isLoading={isSubmitting} color="teal">
+            <StandardButton mt={4} type="submit" isLoading={isSubmitting}>
               Reset Password
-            </Button>
+            </StandardButton>
           </Form>
         )}
       </Formik>

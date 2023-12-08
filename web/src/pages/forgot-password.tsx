@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Flex, Button, Box } from "@chakra-ui/react";
+import { Flex, Box } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import NextLink from "next/link";
 import { InputField } from "../components/InputField";
 import { PageWrapper } from "../components/PageWrapper";
 import { useForgotPasswordMutation } from "../generated/graphql";
+import StandardButton from "../components/base/StandardButton";
 
 const ForgotPassword: React.FC<{}> = ({}) => {
   const [complete, setComplete] = useState(false);
@@ -30,16 +31,16 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                   reset your password
                 </Box>
                 <NextLink href="/login">
-                  <Button color="teal" mt={4}>
+                  <StandardButton mt={4}>
                     Back to login
-                  </Button>
+                  </StandardButton>
                 </NextLink>
               </>
             ) : (
               <Flex mt={4}>
-                <Button type="submit" isLoading={isSubmitting} color="teal">
+                <StandardButton type="submit" isLoading={isSubmitting} color="teal">
                   Send email
-                </Button>
+                </StandardButton>
               </Flex>
             )}
           </Form>

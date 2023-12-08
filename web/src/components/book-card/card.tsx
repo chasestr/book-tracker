@@ -1,9 +1,10 @@
-import { Button, IconButton } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { Book, useDeleteBookMutation } from "../../generated/graphql";
 import styles from "./card.module.css";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
+import StandardButton from "../base/StandardButton";
 
 type BookCardProps = {
   book: Book;
@@ -17,9 +18,9 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
     <div className={styles.card}>
       <div className="card-body">
         <NextLink href="/book/[id]" as={`/book/${p.book.id}`}>
-          <Button>
+          <StandardButton>
             <h2>{p.book.title}</h2>
-          </Button>
+          </StandardButton>
         </NextLink>
         <p>{p.book.author?.slice(0, 50)}</p>
         {p.book.genre ? <p>Genre: {p.book.genre.slice(0, 50)}</p> : null}

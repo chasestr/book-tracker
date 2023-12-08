@@ -5,6 +5,7 @@ import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { createWithApollo } from "../utils/createWithApollo";
 import { PaginatedBooks } from "../generated/graphql";
 import { ChakraProvider } from "@chakra-ui/react";
+import theme from "../theme";
 
 const withApollo = createWithApollo({
   client({ headers }) {
@@ -51,7 +52,7 @@ function MyApp(props: AppProps) {
   const { extraAppProp } = props;
   return (
     <>
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <Component {...pageProps} />
       </ChakraProvider>
     </>

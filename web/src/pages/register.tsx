@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import React from "react";
 import { PageWrapper } from "../components/PageWrapper";
 import { InputField } from "../components/InputField";
-import { Box, Button } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import {
   CurrentUserDocument,
   CurrentUserQuery,
@@ -10,6 +10,7 @@ import {
 } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
+import StandardButton from "../components/base/StandardButton";
 
 const Register = () => {
   const router = useRouter();
@@ -56,9 +57,9 @@ const Register = () => {
                 type="password"
               />
             </Box>
-            <Button mt={4} type="submit" isLoading={isSubmitting} color="teal">
+            <StandardButton mt={4} type="submit" isLoading={isSubmitting}>
               Register
-            </Button>
+            </StandardButton>
           </Form>
         )}
       </Formik>

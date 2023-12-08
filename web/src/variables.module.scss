@@ -1,0 +1,42 @@
+// Colors
+$white: #edf5e1;
+$light-mint: #8ee4af;
+$mint: #5cdb95;
+$dark-mint: #379683;
+$light-blue: #1e5d97;
+$blue: #05386b;
+
+// Font sizes
+$font-size-base: 1rem;
+$font-size-xs: $font-size-base * 0.75;
+$font-size-s: $font-size-base * 0.875;
+$font-size-m: $font-size-base;
+$font-size-l: $font-size-base * 1.25;
+$font-size-xl: $font-size-base * 1.5;
+$font-size-2xl: $font-size-base * 1.75;
+$font-size-3xl: $font-size-base * 2;
+$font-size-4xl: $font-size-base * 2.25;
+$font-size-5xl: $font-size-base * 2.5;
+$font-size-6xl: $font-size-base * 2.75;
+
+:export {
+  // Colors
+  white: $white;
+  light_mint: $light-mint;
+  mint: $mint;
+  dark_mint: $dark-mint;
+  light_blue: $light-blue;
+  blue: $blue;
+
+  // Font sizes
+  font_size_xs: $font-size-xs;
+  font_size_s: $font-size-s;
+  font_size_m: $font-size-m;
+  font_size_l: $font-size-l;
+  font_size_xl: $font-size-xl;
+  font_size_2xl: $font-size-2xl;
+  font_size_3xl: $font-size-3xl;
+  font_size_4xl: $font-size-4xl;
+  font_size_5xl: $font-size-5xl;
+  font_size_6xl: $font-size-6xl;
+}

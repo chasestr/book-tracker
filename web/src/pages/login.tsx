@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import React from "react";
 import { PageWrapper } from "../components/PageWrapper";
 import { InputField } from "../components/InputField";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import {
   CurrentUserDocument,
   CurrentUserQuery,
@@ -11,6 +11,7 @@ import {
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
+import StandardButton from "../components/base/StandardButton";
 
 const Login = () => {
   const router = useRouter();
@@ -60,13 +61,13 @@ const Login = () => {
               />
             </Box>
             <Flex mt={4} justifyContent="space-between">
-              <Button type="submit" isLoading={isSubmitting} color="teal">
+              <StandardButton type="submit" isLoading={isSubmitting}>
                 Login
-              </Button>
+              </StandardButton>
               <NextLink href="/forgot-password">
-                <Button color="teal" alignContent="flex-end">
+                <StandardButton alignContent="flex-end">
                   Forgot password
-                </Button>
+                </StandardButton>
               </NextLink>
             </Flex>
           </Form>

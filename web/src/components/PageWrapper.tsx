@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 import { Navbar } from "./Navbar";
 
@@ -12,16 +12,16 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   variant = "regular",
 }) => {
   return (
-    <>
-    <Navbar />
-    <Box
-      mt={8}
-      mx="auto"
-      maxW={variant === "regular" ? "800px" : "400px"}
-      w="100%"
-    >
-      {children}
-    </Box>
-    </>
+    <Flex direction="column" minHeight="100vh">
+      <Navbar />
+      <Box
+        mt={8}
+        mx="auto"
+        maxW={variant === "regular" ? "800px" : "400px"}
+        w="100%"
+      >
+        {children}
+      </Box>
+    </Flex>
   );
 };

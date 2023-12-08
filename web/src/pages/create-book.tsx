@@ -1,4 +1,3 @@
-import { Button } from "@chakra-ui/button";
 import { Box, Flex } from "@chakra-ui/layout";
 import { Formik, Form } from "formik";
 import React from "react";
@@ -8,10 +7,14 @@ import { TextareaField } from "../components/TextareaField";
 import { useCreateBookMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
 import { isLoggedIn } from "../utils/isLoggedIn";
+import StandardButton from "../components/base/StandardButton";
 
 export const CreateBook: React.FC<{}> = ({}) => {
   const router = useRouter();
-  isLoggedIn();
+  const loggedIn = isLoggedIn();
+  if (!loggedIn) {
+    router.replace("/login?next=" + router.pathname);
+  }
   const [createBook, {}] = useCreateBookMutation();
   return (
     <PageWrapper variant="small">
@@ -111,9 +114,9 @@ export const CreateBook: React.FC<{}> = ({}) => {
               />
             </Box>
             <Flex mt={4}>
-              <Button type="submit" isLoading={isSubmitting} color="teal">
+              <StandardButton type="submit" isLoading={isSubmitting}>
                 Save Book
-              </Button>
+              </StandardButton>
             </Flex>
           </Form>
         )}
