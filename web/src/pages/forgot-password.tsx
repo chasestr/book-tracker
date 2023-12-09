@@ -31,14 +31,12 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                   reset your password
                 </Box>
                 <NextLink href="/login">
-                  <StandardButton mt={4}>
-                    Back to login
-                  </StandardButton>
+                  <StandardButton mt={4}>Back to login</StandardButton>
                 </NextLink>
               </>
             ) : (
               <Flex mt={4}>
-                <StandardButton type="submit" isLoading={isSubmitting} color="teal">
+                <StandardButton type="submit" isLoading={isSubmitting}>
                   Send email
                 </StandardButton>
               </Flex>
