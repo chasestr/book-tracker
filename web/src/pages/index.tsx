@@ -9,6 +9,7 @@ import Features from "../components/home/Features";
 import Testimonials from "../components/home/Testimonials";
 import GetStarted from "../components/home/GetStarted";
 import { NextPage } from "next";
+import styles from "../variables.module.scss";
 
 const Index: NextPage = () => {
   const { data, loading, fetchMore, variables, error } = useBooksQuery({
@@ -46,7 +47,7 @@ const Index: NextPage = () => {
         p={4}
         justifyContent={"space-between"}
       >
-        <Heading>My Books</Heading>
+        <Heading color={styles.blue}>My Books</Heading>
         <NextLink href="/create-book">
           <StandardButton ml="auto">New Book</StandardButton>
         </NextLink>

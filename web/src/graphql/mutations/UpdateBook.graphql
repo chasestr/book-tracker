@@ -1,5 +1,5 @@
-mutation UpdateBook($id: Int!, $title: String) {
-  updateBook(id: $id, title: $title) {
+mutation UpdateBook($id: Int!, $input: BookInput!) {
+  updateBook(id: $id, input: $input) {
     id
     title
     author

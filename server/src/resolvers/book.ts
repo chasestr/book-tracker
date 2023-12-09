@@ -112,13 +112,13 @@ export class BookResolver {
   async updateBook(
     @Ctx() { req }: MyContext,
     @Arg("id", () => Int) id: number,
-    @Arg("title", { nullable: true }) title: string
+    @Arg("input") input: BookInput
   ): Promise<Book | null> {
     const book = await ds
       .getRepository(Book)
       .createQueryBuilder()
       .update(Book)
-      .set({ title }) //figure out how to set all available/modified
+      .set({ ...input })
       .where('id = :id and "userId" = :userId', {
         id,
         userId: req.session.userId,

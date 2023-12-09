@@ -108,7 +108,7 @@ export type MutationRegisterArgs = {
 
 export type MutationUpdateBookArgs = {
   id: Scalars["Int"]["input"];
-  title?: InputMaybe<Scalars["String"]["input"]>;
+  input: BookInput;
 };
 
 export type PaginatedBooks = {
@@ -270,7 +270,7 @@ export type RegisterMutation = {
 
 export type UpdateBookMutationVariables = Exact<{
   id: Scalars["Int"]["input"];
-  title?: InputMaybe<Scalars["String"]["input"]>;
+  input: BookInput;
 }>;
 
 export type UpdateBookMutation = {
@@ -723,8 +723,8 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<
   RegisterMutationVariables
 >;
 export const UpdateBookDocument = gql`
-  mutation UpdateBook($id: Int!, $title: String) {
-    updateBook(id: $id, title: $title) {
+  mutation UpdateBook($id: Int!, $input: BookInput!) {
+    updateBook(id: $id, input: $input) {
       id
       title
       author
@@ -759,7 +759,7 @@ export type UpdateBookMutationFn = Apollo.MutationFunction<
  * const [updateBookMutation, { data, loading, error }] = useUpdateBookMutation({
  *   variables: {
  *      id: // value for 'id'
- *      title: // value for 'title'
+ *      input: // value for 'input'
  *   },
  * });
  */

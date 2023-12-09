@@ -1,10 +1,8 @@
-import { IconButton } from "@chakra-ui/react";
+import { Box, Flex, Link, Text, Button } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { Book, useDeleteBookMutation } from "../../generated/graphql";
-import styles from "./card.module.css";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { useRouter } from "next/router";
-import StandardButton from "../base/StandardButton";
+import variables from "../../variables.module.scss";
+import { useState } from "react";
 
 type BookCardProps = {
   book: Book;
@@ -12,39 +10,73 @@ type BookCardProps = {
 
 export const BookCard: React.FC<BookCardProps> = (p) => {
   const [deleteBook, {}] = useDeleteBookMutation();
-  const router = useRouter();
+  const [isHovering, setIsHovering] = useState(false);
 
   return (
-    <div className={styles.card}>
-      <div className="card-body">
-        <NextLink href="/book/[id]" as={`/book/${p.book.id}`}>
-          <StandardButton>
-            <h2>{p.book.title}</h2>
-          </StandardButton>
-        </NextLink>
-        <p>{p.book.author?.slice(0, 50)}</p>
-        {p.book.genre ? <p>Genre: {p.book.genre.slice(0, 50)}</p> : null}
-        {p.book.rating ? <p>Rating: {p.book.rating}</p> : null}
-        <IconButton
-          icon={<DeleteIcon color="red" />}
-          aria-label="Delete book"
-          onClick={() => {
-            deleteBook({
-              variables: { id: p.book.id },
-              update: (cache) => {
-                cache.evict({ id: "Book:" + p.book.id });
-              },
-            });
-          }}
-        />
-        <IconButton
-          icon={<EditIcon />}
-          aria-label="Edit book"
-          onClick={() => {
-            router.push(`/book/edit/${p.book.id}`);
-          }}
-        />
-      </div>
-    </div>
+    <Box
+      p={4}
+      border={1}
+      borderColor={variables.light_mint}
+      borderRadius="md"
+      boxShadow="md"
+      bg={variables.light_mint}
+      color={variables.blue}
+      width="100%"
+      maxW="800px"
+      mb={4}
+      transition="transform 0.1s ease-in-out"
+      _hover={{ transform: "scale(1.05)" }}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <Flex direction="row" alignItems="center">
+        <Text
+          fontSize={variables.font_size_xl}
+          fontWeight="bold"
+          my={2}
+          isTruncated
+        >
+          {p.book.title} - {p.book.author}
+        </Text>
+        {isHovering && (
+          <Flex
+            direction="row"
+            ml="auto"
+            justifyContent="space-between"
+            align="center"
+          >
+            <Link>
+              <NextLink href="/book/[id]" as={`/book/${p.book.id}`}>
+                <Button
+                  bg={variables.dark_mint}
+                  color={variables.white}
+                  size="md"
+                  _hover={{ bg: variables.extra_dark_mint }}
+                >
+                  View/Edit
+                </Button>
+              </NextLink>
+            </Link>
+            <Button
+              size="md"
+              ml={2}
+              bg={variables.red}
+              color={variables.white}
+              onClick={() => {
+                deleteBook({
+                  variables: { id: p.book.id },
+                  update: (cache) => {
+                    cache.evict({ id: "Book:" + p.book.id });
+                  },
+                });
+              }}
+              _hover={{ bg: variables.dark_red }}
+            >
+              Delete
+            </Button>
+          </Flex>
+        )}
+      </Flex>
+    </Box>
   );
 };

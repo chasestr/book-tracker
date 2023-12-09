@@ -1,124 +1,325 @@
-import { Box, Flex } from "@chakra-ui/layout";
-import { Formik, Form } from "formik";
-import React from "react";
-import { InputField } from "../components/InputField";
-import { PageWrapper } from "../components/PageWrapper";
-import { TextareaField } from "../components/TextareaField";
-import { useCreateBookMutation } from "../generated/graphql";
+import { useState, ChangeEvent } from "react";
 import { useRouter } from "next/router";
-import { isLoggedIn } from "../utils/isLoggedIn";
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Textarea,
+  useToast,
+} from "@chakra-ui/react";
+import { Field, Formik } from "formik";
+import * as Yup from "yup";
+import { useCreateBookMutation } from "../generated/graphql";
+import { PageWrapper } from "../components/PageWrapper";
 import StandardButton from "../components/base/StandardButton";
+import variables from "../variables.module.scss";
 
-export const CreateBook: React.FC<{}> = ({}) => {
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  author: Yup.string().required("Author is required"),
+  publisher: Yup.string().optional(),
+  pages: Yup.number().optional(),
+  startDate: Yup.string().optional(),
+  finishDate: Yup.string().optional(),
+  notes: Yup.string().optional(),
+  summary: Yup.string().optional(),
+  genre: Yup.string().optional(),
+  rating: Yup.number().optional(),
+});
+
+const CreateBook = () => {
   const router = useRouter();
-  const loggedIn = isLoggedIn();
-  if (!loggedIn) {
-    router.replace("/login?next=" + router.pathname);
-  }
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const toast = useToast();
+
   const [createBook, {}] = useCreateBookMutation();
+
+  const initialValues = {
+    title: "",
+    author: "",
+    publisher: undefined,
+    pages: undefined,
+    startDate: undefined,
+    finishDate: undefined,
+    notes: undefined,
+    summary: undefined,
+    genre: undefined,
+    rating: undefined,
+  };
+
+  const handleCancel = () => {
+    if (isFormDirty) {
+      const confirmCancel = window.confirm(
+        "You have unsaved changes. Are you sure you want to cancel?"
+      );
+      if (confirmCancel) {
+        router.back();
+      }
+    } else {
+      router.back();
+    }
+  };
+
   return (
-    <PageWrapper variant="small">
+    <PageWrapper>
+      <Heading mb="4" color={variables.blue} textAlign={"center"}>
+        Create Book
+      </Heading>
       <Formik
-        initialValues={{
-          title: "",
-          author: "",
-          publisher: undefined,
-          pages: undefined,
-          startDate: undefined,
-          finishDate: undefined,
-          notes: undefined,
-          summary: undefined,
-          genre: undefined,
-          rating: undefined,
-        }}
+        initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={async (values) => {
-          const { errors } = await createBook({
-            variables: { input: values },
-            update: (cache) => {
-              cache.evict({ fieldName: "books:{}" });
-            },
-          });
-          if (!errors) {
-            router.push("/");
+          if (isFormDirty) {
+            const { errors } = await createBook({
+              variables: { input: values },
+              update: (cache) => {
+                cache.evict({ fieldName: "books:{}" });
+              },
+            });
+
+            if (!errors) {
+              toast({
+                title: "Book created successfully!",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+              });
+
+              router.back();
+            }
           }
         }}
       >
-        {({ isSubmitting }) => (
-          <Form>
-            <Box>
-              <InputField
+        {(formikProps) => (
+          <form onSubmit={formikProps.handleSubmit}>
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.title && !!formikProps.errors.title
+              }
+            >
+              <FormLabel>Title</FormLabel>
+              <Field
+                type="text"
                 name="title"
-                placeholder="Title"
-                label="Title"
-                required={true}
+                as={Input}
+                required
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField
+              <FormErrorMessage>{formikProps.errors.title}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.author && !!formikProps.errors.author
+              }
+            >
+              <FormLabel>Author</FormLabel>
+              <Field
+                type="text"
                 name="author"
-                placeholder="Author"
-                label="Author"
-                required={true}
+                as={Input}
+                required
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField
+              <FormErrorMessage>{formikProps.errors.author}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.publisher && !!formikProps.errors.publisher
+              }
+            >
+              <FormLabel>Publisher</FormLabel>
+              <Field
+                type="text"
                 name="publisher"
-                placeholder="Publisher"
-                label="Publisher"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField
+              <FormErrorMessage>
+                {formikProps.errors.publisher}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.pages && !!formikProps.errors.pages
+              }
+            >
+              <FormLabel>Number of pages</FormLabel>
+              <Field
+                type="number"
                 name="pages"
-                placeholder="Pages"
-                label="Number of Pages"
-                type="number"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField
+              <FormErrorMessage>{formikProps.errors.pages}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.startDate && !!formikProps.errors.startDate
+              }
+            >
+              <FormLabel>Start date</FormLabel>
+              <Field
+                type="date"
                 name="startDate"
-                placeholder="Start Date"
-                label="Start Date"
-                type="date"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField
+              {(Array.isArray(formikProps.errors.startDate)
+                ? formikProps.errors.startDate
+                : [formikProps.errors.startDate]
+              ).map((error, index) => (
+                <FormErrorMessage key={index}>
+                  {error as string}
+                </FormErrorMessage>
+              ))}
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.finishDate &&
+                !!formikProps.errors.finishDate
+              }
+            >
+              <FormLabel>Finish date</FormLabel>
+              <Field
+                type="date"
                 name="finishDate"
-                placeholder="Finish Date"
-                label="Finish Date"
-                type="date"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <TextareaField name="notes" placeholder="Notes" label="Notes" />
-            </Box>
-            <Box>
-              <TextareaField
+              {(Array.isArray(formikProps.errors.finishDate)
+                ? formikProps.errors.finishDate
+                : [formikProps.errors.finishDate]
+              ).map((error, index) => (
+                <FormErrorMessage key={index}>
+                  {error as string}
+                </FormErrorMessage>
+              ))}
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.notes && !!formikProps.errors.notes
+              }
+            >
+              <FormLabel>Notes</FormLabel>
+              <Field
+                type="text"
+                name="notes"
+                as={Textarea}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
+              />
+              <FormErrorMessage>{formikProps.errors.notes}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.summary && !!formikProps.errors.summary
+              }
+            >
+              <FormLabel>Summary</FormLabel>
+              <Field
+                type="text"
                 name="summary"
-                placeholder="Summary"
-                label="Summary"
+                as={Textarea}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Box>
-              <InputField name="genre" placeholder="Genre" label="Genre" />
-            </Box>
-            <Box>
-              <InputField
-                name="rating"
-                placeholder="Rating 1-10"
-                label="Rating"
+              <FormErrorMessage>{formikProps.errors.summary}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.genre && !!formikProps.errors.genre
+              }
+            >
+              <FormLabel>Genre</FormLabel>
+              <Field
+                type="text"
+                name="genre"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
+              />
+              <FormErrorMessage>{formikProps.errors.genre}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.rating && !!formikProps.errors.rating
+              }
+            >
+              <FormLabel>Rating 1-10</FormLabel>
+              <Field
                 type="number"
+                name="rating"
+                as={Input}
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
               />
-            </Box>
-            <Flex mt={4}>
-              <StandardButton type="submit" isLoading={isSubmitting}>
-                Save Book
-              </StandardButton>
-            </Flex>
-          </Form>
+              <FormErrorMessage>{formikProps.errors.rating}</FormErrorMessage>
+            </FormControl>
+
+            <StandardButton onClick={handleCancel} mr={2} mb={4}>
+              Cancel
+            </StandardButton>
+            <StandardButton type="submit" mb={4}>
+              Save Changes
+            </StandardButton>
+          </form>
         )}
       </Formik>
     </PageWrapper>

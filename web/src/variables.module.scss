@@ -3,8 +3,11 @@ $white: #edf5e1;
 $light-mint: #8ee4af;
 $mint: #5cdb95;
 $dark-mint: #379683;
+$extra-dark-mint: #19544d;
 $light-blue: #1e5d97;
 $blue: #05386b;
+$red: #ff3355;
+$dark-red: #dc143c;
 
 // Font sizes
 $font-size-base: 1rem;
@@ -25,8 +28,11 @@ $font-size-6xl: $font-size-base * 2.75;
   light_mint: $light-mint;
   mint: $mint;
   dark_mint: $dark-mint;
+  extra_dark_mint: $extra-dark-mint;
   light_blue: $light-blue;
   blue: $blue;
+  red: $red;
+  dark_red: $dark-red;
 
   // Font sizes
   font_size_xs: $font-size-xs;
