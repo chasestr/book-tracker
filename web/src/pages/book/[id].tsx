@@ -17,6 +17,7 @@ import { PageWrapper } from "../../components/PageWrapper";
 import StandardButton from "../../components/base/StandardButton";
 import variables from "../../variables.module.scss";
 import { ErrorComponent } from "../../components/base/Error";
+import LoadingSpinner from "../../components/base/LoadingSpinner";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
@@ -47,7 +48,11 @@ const BookDetailsPage = () => {
   });
 
   if (loading) {
-    return <PageWrapper>Loading...</PageWrapper>;
+    return (
+      <PageWrapper>
+        <LoadingSpinner />
+      </PageWrapper>
+    );
   }
 
   if (error) {

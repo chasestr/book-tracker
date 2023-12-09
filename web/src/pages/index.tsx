@@ -11,6 +11,7 @@ import GetStarted from "../components/home/GetStarted";
 import { NextPage } from "next";
 import styles from "../variables.module.scss";
 import { ErrorComponent } from "../components/base/Error";
+import LoadingSpinner from "../components/base/LoadingSpinner";
 
 const Index: NextPage = () => {
   const { data, loading, fetchMore, variables, error } = useBooksQuery({
@@ -54,7 +55,7 @@ const Index: NextPage = () => {
         </NextLink>
       </Flex>
       {loading && !data ? (
-        <div>Loading...</div>
+        <LoadingSpinner />
       ) : (
         <Box display={"flex"} flexWrap={"wrap"} p={4}>
           {data?.books.books.map((b) =>

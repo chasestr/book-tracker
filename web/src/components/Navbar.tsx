@@ -6,6 +6,7 @@ import { useApolloClient } from "@apollo/client";
 import variables from "../variables.module.scss";
 import StandardButton from "./base/StandardButton";
 import Image from "next/image";
+import LoadingSpinner from "./base/LoadingSpinner";
 
 export const Navbar: React.FC<{}> = () => {
   const apolloClient = useApolloClient();
@@ -13,7 +14,7 @@ export const Navbar: React.FC<{}> = () => {
   const { data, loading } = useCurrentUserQuery();
 
   if (loading) {
-    //loading user login
+    return <LoadingSpinner />;
   }
   if (!data?.currentUser) {
     return (
