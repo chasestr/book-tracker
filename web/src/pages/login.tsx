@@ -10,7 +10,7 @@ import {
 } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import NextLink from "next/link";
+// import NextLink from "next/link";
 import StandardButton from "../components/base/StandardButton";
 
 const Login = () => {
@@ -64,11 +64,11 @@ const Login = () => {
               <StandardButton type="submit" isLoading={isSubmitting}>
                 Login
               </StandardButton>
-              <NextLink href="/forgot-password">
+              {/* <NextLink href="/forgot-password">
                 <StandardButton alignContent="flex-end">
                   Forgot password
                 </StandardButton>
-              </NextLink>
+              </NextLink> */}
             </Flex>
           </Form>
         )}
