@@ -16,6 +16,7 @@ import Error from "next/error";
 import { PageWrapper } from "../../components/PageWrapper";
 import StandardButton from "../../components/base/StandardButton";
 import variables from "../../variables.module.scss";
+import { ErrorComponent } from "../../components/base/Error";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
@@ -50,7 +51,11 @@ const BookDetailsPage = () => {
   }
 
   if (error) {
-    return <PageWrapper>{error.message}</PageWrapper>;
+    return (
+      <PageWrapper>
+        <ErrorComponent message="We were unable to find that book. Please try again." />
+      </PageWrapper>
+    );
   }
 
   const initialValues = data?.book

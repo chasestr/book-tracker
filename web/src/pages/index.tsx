@@ -10,6 +10,7 @@ import Testimonials from "../components/home/Testimonials";
 import GetStarted from "../components/home/GetStarted";
 import { NextPage } from "next";
 import styles from "../variables.module.scss";
+import { ErrorComponent } from "../components/base/Error";
 
 const Index: NextPage = () => {
   const { data, loading, fetchMore, variables, error } = useBooksQuery({
@@ -34,7 +35,7 @@ const Index: NextPage = () => {
   if (!loading && !data) {
     return (
       <PageWrapper>
-        <div>No data to show</div>
+        <ErrorComponent message="We were unable to fetch your data." />
       </PageWrapper>
     );
   }
