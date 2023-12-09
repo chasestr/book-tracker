@@ -25,7 +25,7 @@ const GetStarted = () => {
         their reading experience.
       </Text>
       <NextLink href="/register" passHref>
-        <StandardButton size={{ base: "md", md: "lg" }}>
+        <StandardButton size={{ base: "md", md: "lg" }} mb={16}>
           Get Started
         </StandardButton>
       </NextLink>
