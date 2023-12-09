@@ -16,6 +16,12 @@ query Books($limit: Int!, $cursor: String) {
       genre
       rating
       userId
+      user {
+        ...MinimalUser
+        createdAt
+        email
+        updatedAt
+      }
     }
   }
 }
