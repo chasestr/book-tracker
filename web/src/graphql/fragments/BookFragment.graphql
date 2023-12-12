@@ -1,0 +1,20 @@
+fragment BookFragment on Book {
+  id
+  createdAt
+  updatedAt
+  title
+  author
+  status
+  publisher
+  pages
+  startDate
+  finishDate
+  notes
+  summary
+  genre
+  rating
+  userId
+  logs {
+    id
+  }
+}

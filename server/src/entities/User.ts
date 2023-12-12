@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -9,11 +9,12 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Book } from "./Book";
+import { ReadingLog } from "./ReadingLog";
 
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
-  @Field()
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -38,4 +39,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Book, (book) => book.userId)
   books: Book[];
+
+  @OneToMany(() => ReadingLog, (log) => log.user)
+  logs: ReadingLog[];
 }

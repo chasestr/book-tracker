@@ -1,32 +1,31 @@
 import { COOKIE_NAME, __prod__ } from "./constants";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
+import { buildSchema, registerEnumType } from "type-graphql";
 import { BookResolver } from "./resolvers/book";
 import { UserResolver } from "./resolvers/user";
 import RedisStore from "connect-redis";
 import session from "express-session";
 import { Redis } from "ioredis";
 import { getEnv } from "./config";
-import { DataSource } from "typeorm";
 import "reflect-metadata";
-import { Book } from "./entities/Book";
-import { User } from "./entities/User";
-import path from "path";
 import { createUserLoader } from "./dataloaders/User";
+import { DataSource } from "typeorm";
+import { ReadingLogResolver } from "./resolvers/log";
+import { BookStatus } from "./entities/Book";
 
 export const ds = new DataSource({
   type: "postgres",
   url: getEnv("DATABASE_URL"),
   logging: !__prod__,
-  migrations: [path.join(__dirname, "./migrations/*")],
-  entities: [Book, User],
+  entities: ["dist/entities/*.js"],
+  migrations: ["dist/migrations/*.js"],
 });
 
 const main = async () => {
   await ds.initialize();
   const app = express();
-  ds.runMigrations();
+  await ds.runMigrations();
 
   const redisClient = new Redis(getEnv("REDIS_URL"));
   redisClient.connect().catch(console.error);
@@ -54,9 +53,14 @@ const main = async () => {
     })
   );
 
+  registerEnumType(BookStatus, {
+    name: "BookStatus",
+    description: "Available statuses for books",
+  });
+
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [BookResolver, UserResolver],
+      resolvers: [BookResolver, UserResolver, ReadingLogResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({

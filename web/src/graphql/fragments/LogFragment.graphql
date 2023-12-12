@@ -1,0 +1,14 @@
+fragment LogFragment on ReadingLog {
+  id
+  date
+  book {
+    ...BookFragment
+  }
+  user {
+    ...UserFragment
+  }
+  bookId
+  userId
+  pagesRead
+  minutes
+}

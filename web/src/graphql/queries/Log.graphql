@@ -1,0 +1,5 @@
+query Log($id: Int!) {
+  log(id: $id) {
+    ...LogFragment
+  }
+}

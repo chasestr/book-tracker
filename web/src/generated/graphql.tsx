@@ -25,16 +25,18 @@ export type Book = {
   finishDate?: Maybe<Scalars['DateTimeISO']['output']>;
   genre?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  logs: Array<ReadingLog>;
   notes?: Maybe<Scalars['String']['output']>;
   pages?: Maybe<Scalars['Float']['output']>;
   publisher?: Maybe<Scalars['String']['output']>;
   rating?: Maybe<Scalars['Float']['output']>;
   startDate?: Maybe<Scalars['DateTimeISO']['output']>;
+  status: BookStatus;
   summary?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
   user: User;
-  userId: Scalars['Float']['output'];
+  userId: Scalars['Int']['output'];
 };
 
 export type BookInput = {
@@ -46,9 +48,17 @@ export type BookInput = {
   publisher?: InputMaybe<Scalars['String']['input']>;
   rating?: InputMaybe<Scalars['Float']['input']>;
   startDate?: InputMaybe<Scalars['String']['input']>;
+  status: BookStatus;
   summary?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
+
+/** Available statuses for books */
+export enum BookStatus {
+  FINISHED = 'FINISHED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  NOT_STARTED = 'NOT_STARTED'
+}
 
 export type FieldError = {
   __typename?: 'FieldError';
@@ -56,16 +66,26 @@ export type FieldError = {
   message: Scalars['String']['output'];
 };
 
+export type LogInput = {
+  bookId: Scalars['Int']['input'];
+  date: Scalars['String']['input'];
+  minutes?: InputMaybe<Scalars['Float']['input']>;
+  pagesRead?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
   createBook: Book;
+  createLog: ReadingLog;
   deleteBook: Scalars['Boolean']['output'];
+  deleteLog: Scalars['Boolean']['output'];
   forgotPassword: Scalars['Boolean']['output'];
   login: UserResponse;
   logout: Scalars['Boolean']['output'];
   register: UserResponse;
   updateBook?: Maybe<Book>;
+  updateLog?: Maybe<ReadingLog>;
 };
 
 
@@ -80,7 +100,17 @@ export type MutationCreateBookArgs = {
 };
 
 
+export type MutationCreateLogArgs = {
+  input: LogInput;
+};
+
+
 export type MutationDeleteBookArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteLogArgs = {
   id: Scalars['Int']['input'];
 };
 
@@ -106,17 +136,33 @@ export type MutationUpdateBookArgs = {
   input: BookInput;
 };
 
+
+export type MutationUpdateLogArgs = {
+  id: Scalars['Int']['input'];
+  input: LogInput;
+};
+
 export type PaginatedBooks = {
   __typename?: 'PaginatedBooks';
   books: Array<Book>;
   hasMore: Scalars['Boolean']['output'];
 };
 
+export type PaginatedLogs = {
+  __typename?: 'PaginatedLogs';
+  hasMore: Scalars['Boolean']['output'];
+  logs: Array<ReadingLog>;
+};
+
 export type Query = {
   __typename?: 'Query';
   book?: Maybe<Book>;
+  bookLogs: PaginatedLogs;
   books: PaginatedBooks;
+  booksByStatus: Array<Book>;
   currentUser?: Maybe<User>;
+  log?: Maybe<ReadingLog>;
+  userLogs: PaginatedLogs;
 };
 
 
@@ -125,16 +171,53 @@ export type QueryBookArgs = {
 };
 
 
+export type QueryBookLogsArgs = {
+  bookId: Scalars['Int']['input'];
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
+};
+
+
 export type QueryBooksArgs = {
   cursor?: InputMaybe<Scalars['String']['input']>;
   limit: Scalars['Int']['input'];
 };
 
+
+export type QueryBooksByStatusArgs = {
+  status: BookStatus;
+};
+
+
+export type QueryLogArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryUserLogsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
+};
+
+export type ReadingLog = {
+  __typename?: 'ReadingLog';
+  book: Book;
+  bookId: Scalars['Int']['output'];
+  date: Scalars['DateTimeISO']['output'];
+  id: Scalars['Int']['output'];
+  minutes?: Maybe<Scalars['Float']['output']>;
+  pagesRead?: Maybe<Scalars['Float']['output']>;
+  user: User;
+  userId: Scalars['Int']['output'];
+};
+
 export type User = {
   __typename?: 'User';
+  books: Array<Book>;
   createdAt: Scalars['String']['output'];
   email: Scalars['String']['output'];
-  id: Scalars['Float']['output'];
+  id: Scalars['Int']['output'];
+  logs: Array<ReadingLog>;
   updatedAt: Scalars['String']['output'];
   username: Scalars['String']['output'];
 };
@@ -151,11 +234,17 @@ export type UsernamePasswordInput = {
   username: Scalars['String']['input'];
 };
 
+export type BookFragmentFragment = { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> };
+
+export type LogFragmentFragment = { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } };
+
 export type MinimalErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
 export type MinimalUserFragment = { __typename?: 'User', id: number, username: string };
 
 export type MinimalUserResponseFragment = { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string } | null };
+
+export type UserFragmentFragment = { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string };
 
 export type ChangePasswordMutationVariables = Exact<{
   token: Scalars['String']['input'];
@@ -170,7 +259,14 @@ export type CreateBookMutationVariables = Exact<{
 }>;
 
 
-export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, userId: number } };
+export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, userId: number } };
+
+export type CreateLogMutationVariables = Exact<{
+  input: LogInput;
+}>;
+
+
+export type CreateLogMutation = { __typename?: 'Mutation', createLog: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } };
 
 export type DeleteBookMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -178,6 +274,13 @@ export type DeleteBookMutationVariables = Exact<{
 
 
 export type DeleteBookMutation = { __typename?: 'Mutation', deleteBook: boolean };
+
+export type DeleteLogMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteLogMutation = { __typename?: 'Mutation', deleteLog: boolean };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -212,14 +315,22 @@ export type UpdateBookMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBookMutation = { __typename?: 'Mutation', updateBook?: { __typename?: 'Book', id: number, title: string, author: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number } | null };
+export type UpdateBookMutation = { __typename?: 'Mutation', updateBook?: { __typename?: 'Book', id: number, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number } | null };
+
+export type UpdateLogMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  input: LogInput;
+}>;
+
+
+export type UpdateLogMutation = { __typename?: 'Mutation', updateLog?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
 
 export type BookQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
 
 
-export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number } | null };
+export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> } | null };
 
 export type BooksQueryVariables = Exact<{
   limit: Scalars['Int']['input'];
@@ -229,11 +340,81 @@ export type BooksQueryVariables = Exact<{
 
 export type BooksQuery = { __typename?: 'Query', books: { __typename?: 'PaginatedBooks', hasMore: boolean, books: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, user: { __typename?: 'User', createdAt: string, email: string, updatedAt: string, id: number, username: string } }> } };
 
+export type BooksByStatusQueryVariables = Exact<{
+  status: BookStatus;
+}>;
+
+
+export type BooksByStatusQuery = { __typename?: 'Query', booksByStatus: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }> };
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string } | null };
 
+export type LogQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type LogQuery = { __typename?: 'Query', log?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
+
+export type UserLogsQueryVariables = Exact<{
+  limit: Scalars['Int']['input'];
+  cursor?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UserLogsQuery = { __typename?: 'Query', userLogs: { __typename?: 'PaginatedLogs', hasMore: boolean, logs: Array<{ __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null }> } };
+
+export const BookFragmentFragmentDoc = gql`
+    fragment BookFragment on Book {
+  id
+  createdAt
+  updatedAt
+  title
+  author
+  status
+  publisher
+  pages
+  startDate
+  finishDate
+  notes
+  summary
+  genre
+  rating
+  userId
+  logs {
+    id
+  }
+}
+    `;
+export const UserFragmentFragmentDoc = gql`
+    fragment UserFragment on User {
+  id
+  createdAt
+  updatedAt
+  username
+  email
+}
+    `;
+export const LogFragmentFragmentDoc = gql`
+    fragment LogFragment on ReadingLog {
+  id
+  date
+  book {
+    ...BookFragment
+  }
+  user {
+    ...UserFragment
+  }
+  bookId
+  userId
+  pagesRead
+  minutes
+}
+    ${BookFragmentFragmentDoc}
+${UserFragmentFragmentDoc}`;
 export const MinimalErrorFragmentDoc = gql`
     fragment MinimalError on FieldError {
   field
@@ -299,6 +480,7 @@ export const CreateBookDocument = gql`
     updatedAt
     title
     author
+    status
     userId
   }
 }
@@ -329,6 +511,39 @@ export function useCreateBookMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateBookMutationHookResult = ReturnType<typeof useCreateBookMutation>;
 export type CreateBookMutationResult = Apollo.MutationResult<CreateBookMutation>;
 export type CreateBookMutationOptions = Apollo.BaseMutationOptions<CreateBookMutation, CreateBookMutationVariables>;
+export const CreateLogDocument = gql`
+    mutation CreateLog($input: LogInput!) {
+  createLog(input: $input) {
+    ...LogFragment
+  }
+}
+    ${LogFragmentFragmentDoc}`;
+export type CreateLogMutationFn = Apollo.MutationFunction<CreateLogMutation, CreateLogMutationVariables>;
+
+/**
+ * __useCreateLogMutation__
+ *
+ * To run a mutation, you first call `useCreateLogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateLogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createLogMutation, { data, loading, error }] = useCreateLogMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateLogMutation(baseOptions?: Apollo.MutationHookOptions<CreateLogMutation, CreateLogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateLogMutation, CreateLogMutationVariables>(CreateLogDocument, options);
+      }
+export type CreateLogMutationHookResult = ReturnType<typeof useCreateLogMutation>;
+export type CreateLogMutationResult = Apollo.MutationResult<CreateLogMutation>;
+export type CreateLogMutationOptions = Apollo.BaseMutationOptions<CreateLogMutation, CreateLogMutationVariables>;
 export const DeleteBookDocument = gql`
     mutation DeleteBook($id: Int!) {
   deleteBook(id: $id)
@@ -360,6 +575,37 @@ export function useDeleteBookMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteBookMutationHookResult = ReturnType<typeof useDeleteBookMutation>;
 export type DeleteBookMutationResult = Apollo.MutationResult<DeleteBookMutation>;
 export type DeleteBookMutationOptions = Apollo.BaseMutationOptions<DeleteBookMutation, DeleteBookMutationVariables>;
+export const DeleteLogDocument = gql`
+    mutation DeleteLog($id: Int!) {
+  deleteLog(id: $id)
+}
+    `;
+export type DeleteLogMutationFn = Apollo.MutationFunction<DeleteLogMutation, DeleteLogMutationVariables>;
+
+/**
+ * __useDeleteLogMutation__
+ *
+ * To run a mutation, you first call `useDeleteLogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteLogMutation, { data, loading, error }] = useDeleteLogMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteLogMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLogMutation, DeleteLogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteLogMutation, DeleteLogMutationVariables>(DeleteLogDocument, options);
+      }
+export type DeleteLogMutationHookResult = ReturnType<typeof useDeleteLogMutation>;
+export type DeleteLogMutationResult = Apollo.MutationResult<DeleteLogMutation>;
+export type DeleteLogMutationOptions = Apollo.BaseMutationOptions<DeleteLogMutation, DeleteLogMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -494,6 +740,7 @@ export const UpdateBookDocument = gql`
     id
     title
     author
+    status
     publisher
     pages
     startDate
@@ -533,26 +780,47 @@ export function useUpdateBookMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateBookMutationHookResult = ReturnType<typeof useUpdateBookMutation>;
 export type UpdateBookMutationResult = Apollo.MutationResult<UpdateBookMutation>;
 export type UpdateBookMutationOptions = Apollo.BaseMutationOptions<UpdateBookMutation, UpdateBookMutationVariables>;
+export const UpdateLogDocument = gql`
+    mutation UpdateLog($id: Int!, $input: LogInput!) {
+  updateLog(id: $id, input: $input) {
+    ...LogFragment
+  }
+}
+    ${LogFragmentFragmentDoc}`;
+export type UpdateLogMutationFn = Apollo.MutationFunction<UpdateLogMutation, UpdateLogMutationVariables>;
+
+/**
+ * __useUpdateLogMutation__
+ *
+ * To run a mutation, you first call `useUpdateLogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateLogMutation, { data, loading, error }] = useUpdateLogMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateLogMutation(baseOptions?: Apollo.MutationHookOptions<UpdateLogMutation, UpdateLogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateLogMutation, UpdateLogMutationVariables>(UpdateLogDocument, options);
+      }
+export type UpdateLogMutationHookResult = ReturnType<typeof useUpdateLogMutation>;
+export type UpdateLogMutationResult = Apollo.MutationResult<UpdateLogMutation>;
+export type UpdateLogMutationOptions = Apollo.BaseMutationOptions<UpdateLogMutation, UpdateLogMutationVariables>;
 export const BookDocument = gql`
     query Book($id: Int!) {
   book(id: $id) {
-    id
-    createdAt
-    updatedAt
-    title
-    author
-    publisher
-    pages
-    startDate
-    finishDate
-    notes
-    summary
-    genre
-    rating
-    userId
+    ...BookFragment
   }
 }
-    `;
+    ${BookFragmentFragmentDoc}`;
 
 /**
  * __useBookQuery__
@@ -649,6 +917,46 @@ export type BooksQueryHookResult = ReturnType<typeof useBooksQuery>;
 export type BooksLazyQueryHookResult = ReturnType<typeof useBooksLazyQuery>;
 export type BooksSuspenseQueryHookResult = ReturnType<typeof useBooksSuspenseQuery>;
 export type BooksQueryResult = Apollo.QueryResult<BooksQuery, BooksQueryVariables>;
+export const BooksByStatusDocument = gql`
+    query BooksByStatus($status: BookStatus!) {
+  booksByStatus(status: $status) {
+    ...BookFragment
+  }
+}
+    ${BookFragmentFragmentDoc}`;
+
+/**
+ * __useBooksByStatusQuery__
+ *
+ * To run a query within a React component, call `useBooksByStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBooksByStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBooksByStatusQuery({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useBooksByStatusQuery(baseOptions: Apollo.QueryHookOptions<BooksByStatusQuery, BooksByStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<BooksByStatusQuery, BooksByStatusQueryVariables>(BooksByStatusDocument, options);
+      }
+export function useBooksByStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BooksByStatusQuery, BooksByStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<BooksByStatusQuery, BooksByStatusQueryVariables>(BooksByStatusDocument, options);
+        }
+export function useBooksByStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BooksByStatusQuery, BooksByStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<BooksByStatusQuery, BooksByStatusQueryVariables>(BooksByStatusDocument, options);
+        }
+export type BooksByStatusQueryHookResult = ReturnType<typeof useBooksByStatusQuery>;
+export type BooksByStatusLazyQueryHookResult = ReturnType<typeof useBooksByStatusLazyQuery>;
+export type BooksByStatusSuspenseQueryHookResult = ReturnType<typeof useBooksByStatusSuspenseQuery>;
+export type BooksByStatusQueryResult = Apollo.QueryResult<BooksByStatusQuery, BooksByStatusQueryVariables>;
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {
@@ -688,3 +996,92 @@ export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
 export type CurrentUserSuspenseQueryHookResult = ReturnType<typeof useCurrentUserSuspenseQuery>;
 export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
+export const LogDocument = gql`
+    query Log($id: Int!) {
+  log(id: $id) {
+    ...LogFragment
+  }
+}
+    ${LogFragmentFragmentDoc}`;
+
+/**
+ * __useLogQuery__
+ *
+ * To run a query within a React component, call `useLogQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLogQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLogQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useLogQuery(baseOptions: Apollo.QueryHookOptions<LogQuery, LogQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LogQuery, LogQueryVariables>(LogDocument, options);
+      }
+export function useLogLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LogQuery, LogQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LogQuery, LogQueryVariables>(LogDocument, options);
+        }
+export function useLogSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<LogQuery, LogQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LogQuery, LogQueryVariables>(LogDocument, options);
+        }
+export type LogQueryHookResult = ReturnType<typeof useLogQuery>;
+export type LogLazyQueryHookResult = ReturnType<typeof useLogLazyQuery>;
+export type LogSuspenseQueryHookResult = ReturnType<typeof useLogSuspenseQuery>;
+export type LogQueryResult = Apollo.QueryResult<LogQuery, LogQueryVariables>;
+export const UserLogsDocument = gql`
+    query UserLogs($limit: Int!, $cursor: String) {
+  userLogs(cursor: $cursor, limit: $limit) {
+    hasMore
+    logs {
+      id
+      date
+      bookId
+      userId
+      pagesRead
+      minutes
+    }
+  }
+}
+    `;
+
+/**
+ * __useUserLogsQuery__
+ *
+ * To run a query within a React component, call `useUserLogsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserLogsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserLogsQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useUserLogsQuery(baseOptions: Apollo.QueryHookOptions<UserLogsQuery, UserLogsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserLogsQuery, UserLogsQueryVariables>(UserLogsDocument, options);
+      }
+export function useUserLogsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserLogsQuery, UserLogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserLogsQuery, UserLogsQueryVariables>(UserLogsDocument, options);
+        }
+export function useUserLogsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UserLogsQuery, UserLogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UserLogsQuery, UserLogsQueryVariables>(UserLogsDocument, options);
+        }
+export type UserLogsQueryHookResult = ReturnType<typeof useUserLogsQuery>;
+export type UserLogsLazyQueryHookResult = ReturnType<typeof useUserLogsLazyQuery>;
+export type UserLogsSuspenseQueryHookResult = ReturnType<typeof useUserLogsSuspenseQuery>;
+export type UserLogsQueryResult = Apollo.QueryResult<UserLogsQuery, UserLogsQueryVariables>;

@@ -1,16 +1,38 @@
 import { Box, Flex, Link, Text, Button } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { Book, useDeleteBookMutation } from "../../generated/graphql";
+import {
+  ReadingLog,
+  useBookQuery,
+  useDeleteLogMutation,
+} from "../../generated/graphql";
 import variables from "../../variables.module.scss";
 import { useState } from "react";
+import LoadingSpinner from "../base/LoadingSpinner";
+import { ErrorComponent } from "../base/Error";
 
 type BookCardProps = {
-  book: Omit<Book, "logs" | "user" | "status">;
+  log: Omit<ReadingLog, "user" | "book">;
 };
 
-export const BookCard: React.FC<BookCardProps> = (p) => {
-  const [deleteBook, {}] = useDeleteBookMutation();
+export const LogCard: React.FC<BookCardProps> = (p) => {
+  const [deleteLog, {}] = useDeleteLogMutation();
   const [isHovering, setIsHovering] = useState(false);
+  const { data, loading, error } = useBookQuery({
+    variables: { id: p.log.bookId },
+  });
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error || !data?.book?.title) {
+    return (
+      <ErrorComponent
+        message={`We were unable to load this log's associated
+        book. Please try again.`}
+      />
+    );
+  }
 
   return (
     <Box
@@ -36,7 +58,9 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
           my={2}
           isTruncated
         >
-          {p.book.title} - {p.book.author}
+          {p.log.date.split("T")[0]} | {data.book.title}{" "}
+          {p.log.pagesRead ? `| ${p.log.pagesRead}pgs` : null}{" "}
+          {p.log.minutes ? `| ${Math.floor(p.log.minutes / 60)}hrs ${p.log.minutes % 60}mins` : null}
         </Text>
         {isHovering && (
           <Flex
@@ -46,7 +70,7 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
             align="center"
           >
             <Link>
-              <NextLink href="/book/[id]" as={`/book/${p.book.id}`}>
+              <NextLink href="/log/[id]" as={`/log/${p.log.id}`}>
                 <Button
                   bg={variables.dark_mint}
                   color={variables.white}
@@ -63,10 +87,10 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
               bg={variables.red}
               color={variables.white}
               onClick={() => {
-                deleteBook({
-                  variables: { id: p.book.id },
+                deleteLog({
+                  variables: { id: p.log.id },
                   update: (cache) => {
-                    cache.evict({ id: "Book:" + p.book.id });
+                    cache.evict({ id: "ReadingLog:" + p.log.id });
                   },
                 });
               }}

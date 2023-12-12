@@ -3,6 +3,7 @@ mutation UpdateBook($id: Int!, $input: BookInput!) {
     id
     title
     author
+    status
     publisher
     pages
     startDate

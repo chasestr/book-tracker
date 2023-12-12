@@ -3,7 +3,7 @@
 import { useCurrentUserQuery } from "../generated/graphql";
 
 export const isLoggedIn = () => {
-  const { data, loading } = useCurrentUserQuery({ssr: false});
+  const { data, loading } = useCurrentUserQuery({ ssr: false });
   if (!data?.currentUser && !loading) {
     return false;
   }

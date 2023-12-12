@@ -17,7 +17,7 @@ const Login = () => {
   const router = useRouter();
   const [login, {}] = useLoginMutation();
   return (
-    <PageWrapper variant="small">
+    <PageWrapper>
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
@@ -32,6 +32,7 @@ const Login = () => {
                 },
               });
               cache.evict({ fieldName: "books:{}" });
+              cache.evict({ fieldName: "userLogs:{}" });
             },
           });
           if (response.data?.login.errors) {

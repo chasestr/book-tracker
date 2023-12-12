@@ -6,10 +6,18 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
+import { ReadingLog } from "./ReadingLog";
+
+export enum BookStatus {
+  NOT_STARTED = "Not_Started",
+  IN_PROGRESS = "In_Progress",
+  FINISHED = "Finished",
+}
 
 @ObjectType()
 @Entity()
@@ -33,6 +41,14 @@ export class Book extends BaseEntity {
   @Field()
   @Column()
   author!: string;
+
+  @Field(() => BookStatus)
+  @Column({
+    type: "enum",
+    enum: BookStatus,
+    default: BookStatus.NOT_STARTED,
+  })
+  status!: BookStatus;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -66,12 +82,15 @@ export class Book extends BaseEntity {
   @Column({ nullable: true })
   rating?: number;
 
-  @Field()
+  @Field(() => Int)
   @Column()
   userId: number;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.books)
   @JoinColumn({ name: "userId" })
   user: User;
+
+  @OneToMany(() => ReadingLog, (log) => log.book)
+  logs: ReadingLog[];
 }

@@ -1,4 +1,4 @@
-import { Book } from "../entities/Book";
+import { Book, BookStatus } from "../entities/Book";
 import {
   Resolver,
   Query,
@@ -17,6 +17,8 @@ import { MyContext } from "../types";
 import { authenticate } from "../middleware/authentication";
 import { ds } from "..";
 import { User } from "../entities/User";
+import { ReadingLog } from "../entities/ReadingLog";
+import { GraphQLError } from "graphql";
 
 @InputType()
 export class BookInput {
@@ -24,6 +26,8 @@ export class BookInput {
   title: string;
   @Field()
   author: string;
+  @Field(() => BookStatus)
+  status: BookStatus;
   @Field({ nullable: true })
   publisher?: string;
   @Field({ nullable: true })
@@ -57,6 +61,11 @@ export class BookResolver {
     return userLoader.load(book.userId);
   }
 
+  @FieldResolver(() => [ReadingLog])
+  logs(@Root() book: Book) {
+    return ReadingLog.findBy({ bookId: book.id });
+  }
+
   @UseMiddleware(authenticate)
   @Query(() => PaginatedBooks)
   async books(
@@ -83,6 +92,7 @@ export class BookResolver {
     };
   }
 
+  @UseMiddleware(authenticate)
   @Query(() => Book, { nullable: true })
   book(@Arg("id", () => Int) id: number): Promise<Book | null> {
     return Book.findOne({
@@ -90,6 +100,23 @@ export class BookResolver {
         id,
       },
     });
+  }
+
+  @UseMiddleware(authenticate)
+  @Query(() => [Book])
+  booksByStatus(
+    @Arg("status", () => BookStatus) status: BookStatus,
+    @Ctx() { req }: MyContext
+  ): Promise<Book[]> {
+    const books = Book.findBy({ status: status, userId: req.session.userId });
+    if (!books) {
+      throw new GraphQLError("No books found", {
+        extensions: {
+          code: "INTERNAL_SERVER_ERROR",
+        },
+      });
+    }
+    return books;
   }
 
   @Mutation(() => Book)
@@ -104,9 +131,6 @@ export class BookResolver {
     }).save();
   }
 
-  //determine how to update an entire record based
-  //on whatever fields the user has modified
-  //Maybe just use a state on the book page for editing/not editing?
   @Mutation(() => Book, { nullable: true })
   @UseMiddleware(authenticate)
   async updateBook(

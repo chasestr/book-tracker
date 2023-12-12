@@ -1,0 +1,5 @@
+mutation UpdateLog($id: Int!, $input: LogInput!) {
+  updateLog(id: $id, input: $input) {
+    ...LogFragment
+  }
+}

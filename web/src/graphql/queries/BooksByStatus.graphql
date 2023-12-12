@@ -1,0 +1,5 @@
+query BooksByStatus($status: BookStatus!) {
+  booksByStatus(status: $status) {
+    ...BookFragment
+  }
+}

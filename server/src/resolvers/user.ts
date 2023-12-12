@@ -6,6 +6,8 @@ import {
   Ctx,
   ObjectType,
   Query,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import { MyContext } from "../types";
 import argon2 from "argon2";
@@ -16,6 +18,8 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { ds } from "..";
+import { Book } from "../entities/Book";
+import { ReadingLog } from "../entities/ReadingLog";
 require("express");
 
 @ObjectType()
@@ -35,8 +39,18 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => [Book])
+  books(@Root() user: User) {
+    return Book.findBy({ userId: user.id });
+  }
+
+  @FieldResolver(() => [ReadingLog])
+  logs(@Root() user: User) {
+    return ReadingLog.findBy({ userId: user.id });
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg("token") token: string,
@@ -115,12 +129,12 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req }: MyContext) {
+  async currentUser(@Ctx() { req }: MyContext) {
     if (!req.session.userId) {
       return null;
     }
 
-    return User.findOne({ where: { id: req.session.userId } });
+    return await User.findOne({ where: { id: req.session.userId } });
   }
 
   @Mutation(() => UserResponse)
@@ -161,7 +175,6 @@ export class UserResolver {
       }
     }
 
-    //log user in after registering
     req.session.userId = user.id;
 
     return { user };
@@ -200,7 +213,6 @@ export class UserResolver {
       };
     }
 
-    //set user cookie to store user session
     req.session.userId = user.id;
 
     return {

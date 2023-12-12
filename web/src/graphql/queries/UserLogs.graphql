@@ -1,0 +1,13 @@
+query UserLogs($limit: Int!, $cursor: String) {
+  userLogs(cursor: $cursor, limit: $limit) {
+    hasMore
+    logs {
+      id
+      date
+      bookId
+      userId
+      pagesRead
+      minutes
+    }
+  }
+}

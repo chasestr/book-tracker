@@ -19,7 +19,7 @@ export const ChangePassword: NextPage<{ token: string }> = () => {
   const [changePassword, {}] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
   return (
-    <PageWrapper variant="small">
+    <PageWrapper>
       <Formik
         initialValues={{ newPassword: "" }}
         onSubmit={async (values, { setErrors }) => {
@@ -40,6 +40,7 @@ export const ChangePassword: NextPage<{ token: string }> = () => {
                 },
               });
               cache.evict({ fieldName: "books:{}" });
+              cache.evict({ fieldName: "userLogs:{}" });
             },
           });
           if (response.data?.changePassword.errors) {

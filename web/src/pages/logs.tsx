@@ -1,6 +1,5 @@
-import { useBooksQuery } from "../generated/graphql";
+import { useUserLogsQuery } from "../generated/graphql";
 import { PageWrapper } from "../components/PageWrapper";
-import { BookCard } from "../components/book-card/card";
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import NextLink from "next/link";
 import StandardButton from "../components/base/StandardButton";
@@ -12,9 +11,10 @@ import { NextPage } from "next";
 import styles from "../variables.module.scss";
 import { ErrorComponent } from "../components/base/Error";
 import LoadingSpinner from "../components/base/LoadingSpinner";
+import { LogCard } from "../components/log-card/card";
 
-const Index: NextPage = () => {
-  const { data, loading, fetchMore, variables, error } = useBooksQuery({
+const Logs: NextPage = () => {
+  const { data, loading, fetchMore, variables, error } = useUserLogsQuery({
     variables: {
       limit: 10,
       cursor: null,
@@ -36,7 +36,7 @@ const Index: NextPage = () => {
   if (!loading && !data) {
     return (
       <PageWrapper>
-        <ErrorComponent message="We were unable to fetch your data." />
+        <ErrorComponent message="We were unable to fetch your log data." />
       </PageWrapper>
     );
   }
@@ -49,29 +49,31 @@ const Index: NextPage = () => {
         p={4}
         justifyContent={"space-between"}
       >
-        <Heading color={styles.blue}>My Books</Heading>
-        <NextLink href="/create-book">
-          <StandardButton ml="auto">New Book</StandardButton>
+        <Heading color={styles.blue}>My Logs</Heading>
+        <NextLink href="/create-log">
+          <StandardButton ml="auto">New Log</StandardButton>
         </NextLink>
       </Flex>
       {loading && !data ? (
         <LoadingSpinner />
       ) : (
         <Box display={"flex"} flexWrap={"wrap"} p={4}>
-          {data?.books.books.map((b) =>
-            !b ? null : <BookCard book={b} key={b.id}></BookCard>
+          {data?.userLogs.logs.map((l) =>
+            !l ? null : <LogCard log={l} key={l.id}></LogCard>
           )}
         </Box>
       )}
-      {data && data.books.hasMore ? (
+      {data && data.userLogs.hasMore ? (
         <Flex>
           <StandardButton
-            size={"lg"}
+            size="lg"
             onClick={() => {
               fetchMore({
                 variables: {
                   limit: variables?.limit,
-                  cursor: data.books.books[data.books.books.length - 1].title,
+                  cursor: `${
+                    data.userLogs.logs[data.userLogs.logs.length - 1].date
+                  }_${data.userLogs.logs[data.userLogs.logs.length - 1].id}`,
                 },
               });
             }}
@@ -87,4 +89,4 @@ const Index: NextPage = () => {
   );
 };
 
-export default Index;
+export default Logs;

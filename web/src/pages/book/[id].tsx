@@ -6,22 +6,31 @@ import {
   FormLabel,
   Heading,
   Input,
+  Select,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
 import * as Yup from "yup";
-import { useBookQuery, useUpdateBookMutation } from "../../generated/graphql";
+import {
+  BookStatus,
+  useBookQuery,
+  useUpdateBookMutation,
+} from "../../generated/graphql";
 import Error from "next/error";
 import { PageWrapper } from "../../components/PageWrapper";
 import StandardButton from "../../components/base/StandardButton";
 import variables from "../../variables.module.scss";
 import { ErrorComponent } from "../../components/base/Error";
 import LoadingSpinner from "../../components/base/LoadingSpinner";
+import { formatEnumValue } from "../../utils/formatEnumValue";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   author: Yup.string().required("Author is required"),
+  status: Yup.string()
+    .oneOf(Object.values(BookStatus), "Invalid book status")
+    .required("Book status is required"),
   publisher: Yup.string().optional(),
   pages: Yup.number().optional(),
   startDate: Yup.string().optional(),
@@ -67,6 +76,7 @@ const BookDetailsPage = () => {
     ? {
         title: data.book.title,
         author: data.book.author,
+        status: data.book.status,
         publisher: data.book.publisher ?? undefined,
         pages: data.book.pages ?? undefined,
         startDate: data.book.startDate
@@ -83,6 +93,7 @@ const BookDetailsPage = () => {
     : {
         title: "",
         author: "",
+        status: BookStatus.NOT_STARTED,
         publisher: undefined,
         pages: undefined,
         startDate: undefined,
@@ -102,7 +113,7 @@ const BookDetailsPage = () => {
         router.back();
       }
     } else {
-      router.back();
+      router.push("/");
     }
   };
 
@@ -142,7 +153,7 @@ const BookDetailsPage = () => {
                 isClosable: true,
               });
 
-              router.back();
+              router.push("/");
             }
           } else {
             toast({
@@ -196,6 +207,32 @@ const BookDetailsPage = () => {
                 bg={variables.light_mint}
               />
               <FormErrorMessage>{formikProps.errors.author}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.status && !!formikProps.errors.status
+              }
+            >
+              <FormLabel>Status</FormLabel>
+              <Field
+                name="status"
+                as={Select}
+                required
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
+              >
+                {Object.entries(BookStatus).map(([key, value]) => (
+                  <option key={key} value={value}>
+                    {formatEnumValue(value)}
+                  </option>
+                ))}
+              </Field>
+              <FormErrorMessage>{formikProps.errors.status}</FormErrorMessage>
             </FormControl>
 
             <FormControl
@@ -361,7 +398,7 @@ const BookDetailsPage = () => {
                 formikProps.touched.rating && !!formikProps.errors.rating
               }
             >
-              <FormLabel>Rating 1-10</FormLabel>
+              <FormLabel>Rating (number)</FormLabel>
               <Field
                 type="number"
                 name="rating"

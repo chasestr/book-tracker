@@ -6,19 +6,24 @@ import {
   FormLabel,
   Heading,
   Input,
+  Select,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
 import * as Yup from "yup";
-import { useCreateBookMutation } from "../generated/graphql";
+import { BookStatus, useCreateBookMutation } from "../generated/graphql";
 import { PageWrapper } from "../components/PageWrapper";
 import StandardButton from "../components/base/StandardButton";
 import variables from "../variables.module.scss";
+import { formatEnumValue } from "../utils/formatEnumValue";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   author: Yup.string().required("Author is required"),
+  status: Yup.string()
+    .oneOf(Object.values(BookStatus), "Invalid book status")
+    .required("Book status is required"),
   publisher: Yup.string().optional(),
   pages: Yup.number().optional(),
   startDate: Yup.string().optional(),
@@ -39,6 +44,7 @@ const CreateBook = () => {
   const initialValues = {
     title: "",
     author: "",
+    status: BookStatus.NOT_STARTED,
     publisher: undefined,
     pages: undefined,
     startDate: undefined,
@@ -58,7 +64,7 @@ const CreateBook = () => {
         router.back();
       }
     } else {
-      router.back();
+      router.push("/");
     }
   };
 
@@ -87,7 +93,7 @@ const CreateBook = () => {
                 isClosable: true,
               });
 
-              router.back();
+              router.push("/");
             }
           }
         }}
@@ -134,6 +140,32 @@ const CreateBook = () => {
                 bg={variables.light_mint}
               />
               <FormErrorMessage>{formikProps.errors.author}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              mb="4"
+              isInvalid={
+                formikProps.touched.status && !!formikProps.errors.status
+              }
+            >
+              <FormLabel>Status</FormLabel>
+              <Field
+                name="status"
+                as={Select}
+                required
+                onChange={(e: string | ChangeEvent<any>) => {
+                  formikProps.handleChange(e);
+                  setIsFormDirty(true);
+                }}
+                bg={variables.light_mint}
+              >
+                {Object.entries(BookStatus).map(([key, value]) => (
+                  <option key={key} value={value}>
+                    {formatEnumValue(value)}
+                  </option>
+                ))}
+              </Field>
+              <FormErrorMessage>{formikProps.errors.status}</FormErrorMessage>
             </FormControl>
 
             <FormControl
@@ -299,7 +331,7 @@ const CreateBook = () => {
                 formikProps.touched.rating && !!formikProps.errors.rating
               }
             >
-              <FormLabel>Rating 1-10</FormLabel>
+              <FormLabel>Rating (number)</FormLabel>
               <Field
                 type="number"
                 name="rating"

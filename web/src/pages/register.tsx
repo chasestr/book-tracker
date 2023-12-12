@@ -16,7 +16,7 @@ const Register = () => {
   const router = useRouter();
   const [register, {}] = useRegisterMutation();
   return (
-    <PageWrapper variant="small">
+    <PageWrapper >
       <Formik
         initialValues={{ username: "", email: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
