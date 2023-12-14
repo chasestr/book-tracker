@@ -37,6 +37,13 @@ This repository serves as a showcase of my skills in web development and UI/UX d
 
 - **Database:**
   - PostgreSQL
+ 
+- **Deployment Platform:**
+- Dokku
+- Digital Ocean
+
+- **Containerization:**
+  - Docker
 
 - **Caching:**
   - Redis
