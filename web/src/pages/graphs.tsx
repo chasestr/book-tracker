@@ -27,12 +27,20 @@ const Graphs: React.FC = () => {
     );
   }
 
+  const filteredData = data.userLogsWithoutPagination.filter(
+    (d) => d.pagesRead
+  );
+
+  const minimumDataPoints = 10;
+
   return (
     <PageWrapper>
       <Heading mb={12} color={variables.blue} textAlign={"center"}>
         Pages Read
       </Heading>
-      <ReadingProgressLineChart data={data.userLogsWithoutPagination} />
+      {filteredData.length > minimumDataPoints ? (
+        <ReadingProgressLineChart data={data.userLogsWithoutPagination} />
+      ) : null}
       <Flex my={4} bg={variables.dark_mint} borderRadius={25}>
         <Text color={variables.white} p={4} align={"center"}>
           The visualizations for pages read in the last year, month, and day
