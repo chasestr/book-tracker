@@ -39,8 +39,8 @@ This repository serves as a showcase of my skills in web development and UI/UX d
   - PostgreSQL
  
 - **Deployment Platform:**
-- Dokku
-- Digital Ocean
+  - Dokku
+  - Digital Ocean
 
 - **Containerization:**
   - Docker
