@@ -8,7 +8,7 @@ const StandardButton = forwardRef<HTMLButtonElement, ButtonProps>(
       <Button
         ref={ref}
         color={variables.white}
-        bg={variables.blue}
+        bg={props.bg ? props.bg : variables.blue}
         _hover={{ bg: variables.light_blue }}
         {...props}
       >

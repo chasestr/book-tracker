@@ -15,6 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  Date: { input: any; output: any; }
   DateTimeISO: { input: any; output: any; }
 };
 
@@ -77,6 +78,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
   createBook: Book;
+  createDemoUser: Scalars['Boolean']['output'];
   createLog: ReadingLog;
   deleteBook: Scalars['Boolean']['output'];
   deleteLog: Scalars['Boolean']['output'];
@@ -163,6 +165,7 @@ export type Query = {
   currentUser?: Maybe<User>;
   log?: Maybe<ReadingLog>;
   userLogs: PaginatedLogs;
+  userLogsWithoutPagination: Array<ReadingLog>;
 };
 
 
@@ -203,7 +206,7 @@ export type ReadingLog = {
   __typename?: 'ReadingLog';
   book: Book;
   bookId: Scalars['Int']['output'];
-  date: Scalars['DateTimeISO']['output'];
+  date: Scalars['Date']['output'];
   id: Scalars['Int']['output'];
   minutes?: Maybe<Scalars['Float']['output']>;
   pagesRead?: Maybe<Scalars['Float']['output']>;
@@ -260,6 +263,11 @@ export type CreateBookMutationVariables = Exact<{
 
 
 export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, userId: number } };
+
+export type CreateDemoUserMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateDemoUserMutation = { __typename?: 'Mutation', createDemoUser: boolean };
 
 export type CreateLogMutationVariables = Exact<{
   input: LogInput;
@@ -366,6 +374,11 @@ export type UserLogsQueryVariables = Exact<{
 
 
 export type UserLogsQuery = { __typename?: 'Query', userLogs: { __typename?: 'PaginatedLogs', hasMore: boolean, logs: Array<{ __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null }> } };
+
+export type UserLogsWithoutPaginationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserLogsWithoutPaginationQuery = { __typename?: 'Query', userLogsWithoutPagination: Array<{ __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null }> };
 
 export const BookFragmentFragmentDoc = gql`
     fragment BookFragment on Book {
@@ -511,6 +524,36 @@ export function useCreateBookMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateBookMutationHookResult = ReturnType<typeof useCreateBookMutation>;
 export type CreateBookMutationResult = Apollo.MutationResult<CreateBookMutation>;
 export type CreateBookMutationOptions = Apollo.BaseMutationOptions<CreateBookMutation, CreateBookMutationVariables>;
+export const CreateDemoUserDocument = gql`
+    mutation CreateDemoUser {
+  createDemoUser
+}
+    `;
+export type CreateDemoUserMutationFn = Apollo.MutationFunction<CreateDemoUserMutation, CreateDemoUserMutationVariables>;
+
+/**
+ * __useCreateDemoUserMutation__
+ *
+ * To run a mutation, you first call `useCreateDemoUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDemoUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDemoUserMutation, { data, loading, error }] = useCreateDemoUserMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCreateDemoUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateDemoUserMutation, CreateDemoUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDemoUserMutation, CreateDemoUserMutationVariables>(CreateDemoUserDocument, options);
+      }
+export type CreateDemoUserMutationHookResult = ReturnType<typeof useCreateDemoUserMutation>;
+export type CreateDemoUserMutationResult = Apollo.MutationResult<CreateDemoUserMutation>;
+export type CreateDemoUserMutationOptions = Apollo.BaseMutationOptions<CreateDemoUserMutation, CreateDemoUserMutationVariables>;
 export const CreateLogDocument = gql`
     mutation CreateLog($input: LogInput!) {
   createLog(input: $input) {
@@ -1085,3 +1128,47 @@ export type UserLogsQueryHookResult = ReturnType<typeof useUserLogsQuery>;
 export type UserLogsLazyQueryHookResult = ReturnType<typeof useUserLogsLazyQuery>;
 export type UserLogsSuspenseQueryHookResult = ReturnType<typeof useUserLogsSuspenseQuery>;
 export type UserLogsQueryResult = Apollo.QueryResult<UserLogsQuery, UserLogsQueryVariables>;
+export const UserLogsWithoutPaginationDocument = gql`
+    query UserLogsWithoutPagination {
+  userLogsWithoutPagination {
+    id
+    date
+    bookId
+    userId
+    pagesRead
+    minutes
+  }
+}
+    `;
+
+/**
+ * __useUserLogsWithoutPaginationQuery__
+ *
+ * To run a query within a React component, call `useUserLogsWithoutPaginationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserLogsWithoutPaginationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserLogsWithoutPaginationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserLogsWithoutPaginationQuery(baseOptions?: Apollo.QueryHookOptions<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>(UserLogsWithoutPaginationDocument, options);
+      }
+export function useUserLogsWithoutPaginationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>(UserLogsWithoutPaginationDocument, options);
+        }
+export function useUserLogsWithoutPaginationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>(UserLogsWithoutPaginationDocument, options);
+        }
+export type UserLogsWithoutPaginationQueryHookResult = ReturnType<typeof useUserLogsWithoutPaginationQuery>;
+export type UserLogsWithoutPaginationLazyQueryHookResult = ReturnType<typeof useUserLogsWithoutPaginationLazyQuery>;
+export type UserLogsWithoutPaginationSuspenseQueryHookResult = ReturnType<typeof useUserLogsWithoutPaginationSuspenseQuery>;
+export type UserLogsWithoutPaginationQueryResult = Apollo.QueryResult<UserLogsWithoutPaginationQuery, UserLogsWithoutPaginationQueryVariables>;

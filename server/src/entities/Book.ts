@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -78,8 +78,8 @@ export class Book extends BaseEntity {
   @Column({ nullable: true })
   genre?: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Field(() => Float, { nullable: true })
+  @Column({ nullable: true, type: "float" })
   rating?: number;
 
   @Field(() => Int)

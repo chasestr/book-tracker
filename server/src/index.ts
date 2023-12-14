@@ -13,6 +13,7 @@ import { createUserLoader } from "./dataloaders/User";
 import { DataSource } from "typeorm";
 import { ReadingLogResolver } from "./resolvers/log";
 import { BookStatus } from "./entities/Book";
+import { DemoResolver } from "./resolvers/createDemoUser";
 
 export const ds = new DataSource({
   type: "postgres",
@@ -60,7 +61,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [BookResolver, UserResolver, ReadingLogResolver],
+      resolvers: [BookResolver, UserResolver, ReadingLogResolver, DemoResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({

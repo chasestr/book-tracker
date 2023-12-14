@@ -1,0 +1,10 @@
+query UserLogsWithoutPagination {
+  userLogsWithoutPagination {
+    id
+    date
+    bookId
+    userId
+    pagesRead
+    minutes
+  }
+}

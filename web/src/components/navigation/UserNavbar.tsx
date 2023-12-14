@@ -19,7 +19,7 @@ const navbarOptions: NavbarOption[] = [
   { title: "New Book", href: "/create-book" },
   { title: "Logs", href: "/logs" },
   { title: "New Log", href: "/create-log" },
-  { title: "Graphs", href: "/graphs"},
+  { title: "Graphs", href: "/graphs" },
 ];
 
 const emblaOptions = {
@@ -134,6 +134,7 @@ const UserNavbar: React.FC<{ variant: string }> = (p) => {
         </Box>
         <StandardButton
           onClick={async () => {
+            router.push("/");
             await logout({});
             await apolloClient.resetStore();
           }}

@@ -3,20 +3,29 @@ import React from "react";
 import UserNavbar from "./navigation/UserNavbar";
 import { isLoggedIn } from "../utils/isLoggedIn";
 import VisitorNavbar from "./navigation/VisitorNavbar";
+import DemoEntryNavbar from "./navigation/DemoEntryNavbar";
 
 interface PageWrapperProps {
   readonly children?: React.ReactNode;
   readonly variant?: "small" | "regular";
+  readonly demo?: boolean;
 }
 
 export const PageWrapper: React.FC<PageWrapperProps> = ({
   children,
   variant = "regular",
+  demo = false,
 }) => {
   const user = isLoggedIn();
   return (
     <Flex direction="column" minHeight="100vh">
-      {user ? <UserNavbar variant={variant} /> : <VisitorNavbar />}
+      {demo ? (
+        <DemoEntryNavbar />
+      ) : user ? (
+        <UserNavbar variant={variant} />
+      ) : (
+        <VisitorNavbar />
+      )}
       <Box
         mt={8}
         mx="auto"

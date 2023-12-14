@@ -87,6 +87,19 @@ export class ReadingLogResolver {
   }
 
   @UseMiddleware(authenticate)
+  @Query(() => [ReadingLog])
+  async userLogsWithoutPagination(
+    @Ctx() { req }: MyContext
+  ): Promise<ReadingLog[] | null> {
+    const qb = ds
+      .getRepository(ReadingLog)
+      .createQueryBuilder()
+      .where('"userId" = :id', { id: req.session.userId });
+
+    return await qb.getMany();
+  }
+
+  @UseMiddleware(authenticate)
   @Query(() => PaginatedLogs)
   async bookLogs(
     @Arg("limit", () => Int) limit: number,
