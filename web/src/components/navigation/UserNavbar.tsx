@@ -45,7 +45,7 @@ const UserNavbar: React.FC<{ variant: string }> = (p) => {
           )
         : 0,
     },
-    [WheelGesturesPlugin()]
+    [WheelGesturesPlugin({forceWheelAxis: "y"})]
   );
 
   const NavbarItems = navbarOptions.map((o, idx) => (
@@ -88,7 +88,7 @@ const UserNavbar: React.FC<{ variant: string }> = (p) => {
 
   useEffect(() => {
     if (!embla) return;
-    embla.reInit({ ...emblaOptions, align: "center" });
+    embla.reInit({ ...emblaOptions, align: "center" }, [WheelGesturesPlugin({forceWheelAxis: "y"})]);
   }, [embla]);
 
   return (
