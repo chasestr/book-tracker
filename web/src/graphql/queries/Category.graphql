@@ -1,0 +1,5 @@
+query Category($id: Int!) {
+    category(id: $id) {
+        ...CategoryFragment
+    }
+}

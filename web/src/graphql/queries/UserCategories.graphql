@@ -1,0 +1,9 @@
+query UserCategories($limit: Int!, $cursor: String) {
+  userCategories(cursor: $cursor, limit: $limit) {
+    hasMore
+    categories {
+        id
+        name
+    }
+  }
+}

@@ -1,0 +1,7 @@
+fragment CategoryFragment on Category {
+  id
+  name
+  books {
+    ...BookFragment
+  }
+}
