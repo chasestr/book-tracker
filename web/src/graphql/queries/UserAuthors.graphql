@@ -1,0 +1,9 @@
+query UserAuthors($limit: Int!, $cursor: String) {
+  userAuthors(cursor: $cursor, limit: $limit) {
+    hasMore
+    categories {
+        id
+        name
+    }
+  }
+}

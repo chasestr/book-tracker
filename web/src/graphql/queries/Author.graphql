@@ -1,0 +1,5 @@
+query Author($id: Int!) {
+    author(id: $id) {
+        ...AuthorFragment
+    }
+}
