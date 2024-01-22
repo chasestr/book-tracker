@@ -10,6 +10,8 @@ import {
 } from "typeorm";
 import { Book } from "./Book";
 import { ReadingLog } from "./ReadingLog";
+import { Author } from "./Author";
+import { Category } from "./Category";
 
 @ObjectType()
 @Entity()
@@ -41,6 +43,16 @@ export class User extends BaseEntity {
     cascade: true,
   })
   books: Book[];
+
+  @OneToMany(() => Author, (author) => author.userId, {
+    cascade: true,
+  })
+  authors: Author[];
+
+  @OneToMany(() => Category, (category) => category.userId, {
+    cascade: true,
+  })
+  categories: Category[];
 
   @OneToMany(() => ReadingLog, (log) => log.user, {
     cascade: true,
