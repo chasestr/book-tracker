@@ -59,6 +59,19 @@ export class AuthorResolver {
   }
 
   @UseMiddleware(authenticate)
+  @Query(() => [Author])
+  async userAuthorsWithoutPagination(
+    @Ctx() { req }: MyContext
+  ): Promise<Author[] | null> {
+    const qb = ds
+      .getRepository(Author)
+      .createQueryBuilder()
+      .where('"userId" = :id', { id: req.session.userId });
+
+    return await qb.getMany();
+  }
+
+  @UseMiddleware(authenticate)
   @Query(() => Author, { nullable: true })
   author(@Arg("id", () => Int) id: number): Promise<Author | null> {
     return Author.findOne({

@@ -90,8 +90,6 @@ main().catch((err) => {
   console.log(err);
 });
 
-//create queries to retrieve all authors and categories for user.
-//create mutations to add authors and categories.
 //update forms and add autofill option. forms should use dropdowns with add options
 //for authors/categories, similar to how spotify add to playlist looks.
 //set up search bar component.

@@ -1,0 +1,7 @@
+query UserAuthorsWithoutPagination {
+    userAuthorsWithoutPagination {
+        id
+        name
+        userId
+    }
+}

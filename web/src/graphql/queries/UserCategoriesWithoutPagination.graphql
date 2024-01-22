@@ -1,0 +1,7 @@
+query UserCategoriesWithoutPagination {
+    userCategoriesWithoutPagination {
+        id
+        name
+        userId
+    }
+}

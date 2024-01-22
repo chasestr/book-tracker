@@ -59,8 +59,21 @@ export class CategoryResolver {
   }
 
   @UseMiddleware(authenticate)
+  @Query(() => [Category])
+  async userCategoriesWithoutPagination(
+    @Ctx() { req }: MyContext
+  ): Promise<Category[] | null> {
+    const qb = ds
+      .getRepository(Category)
+      .createQueryBuilder()
+      .where('"userId" = :id', { id: req.session.userId });
+
+    return await qb.getMany();
+  }
+
+  @UseMiddleware(authenticate)
   @Query(() => Category, { nullable: true })
-  Category(@Arg("id", () => Int) id: number): Promise<Category | null> {
+  category(@Arg("id", () => Int) id: number): Promise<Category | null> {
     return Category.findOne({
       where: {
         id,
