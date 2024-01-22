@@ -89,3 +89,15 @@ const main = async () => {
 main().catch((err) => {
   console.log(err);
 });
+
+//create queries to retrieve all authors and categories for user.
+//create mutations to add authors and categories.
+//update forms and add autofill option. forms should use dropdowns with add options
+//for authors/categories, similar to how spotify add to playlist looks.
+//set up search bar component.
+//Check that entries in the join table for book_authors and book_categories are updating correctly
+//meaning that they should be added to when a user selects categories/authors
+//on a create or update book form.
+//
+
+//potentially going to want a place to manage authors/categories (ex. update/remove)

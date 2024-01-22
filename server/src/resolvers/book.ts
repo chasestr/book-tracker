@@ -6,7 +6,6 @@ import {
   Mutation,
   Field,
   Ctx,
-  InputType,
   UseMiddleware,
   Int,
   ObjectType,
@@ -19,32 +18,7 @@ import { ds } from "..";
 import { User } from "../entities/User";
 import { ReadingLog } from "../entities/ReadingLog";
 import { GraphQLError } from "graphql";
-
-@InputType()
-export class BookInput {
-  @Field()
-  title: string;
-  @Field()
-  author: string;
-  @Field(() => BookStatus)
-  status: BookStatus;
-  @Field({ nullable: true })
-  publisher?: string;
-  @Field({ nullable: true })
-  pages?: number;
-  @Field({ nullable: true })
-  startDate?: string;
-  @Field({ nullable: true })
-  finishDate?: string;
-  @Field({ nullable: true })
-  notes?: string;
-  @Field({ nullable: true })
-  summary?: string;
-  @Field({ nullable: true })
-  genre?: string;
-  @Field({ nullable: true })
-  rating?: number;
-}
+import { BookInput } from "../types/BookInput";
 
 @ObjectType()
 export class PaginatedBooks {
@@ -77,6 +51,8 @@ export class BookResolver {
     const qb = ds
       .getRepository(Book)
       .createQueryBuilder()
+      .leftJoinAndSelect("book.authors", "authors")
+      .leftJoinAndSelect("book.categories", "categories")
       .where('"userId" = :id', { id: req.session.userId })
       .orderBy('"title"', "ASC")
       .take(realLimit + 1);
@@ -99,6 +75,10 @@ export class BookResolver {
       where: {
         id,
       },
+      relations: {
+        authors: true,
+        categories: true,
+      },
     });
   }
 
@@ -108,7 +88,13 @@ export class BookResolver {
     @Arg("status", () => BookStatus) status: BookStatus,
     @Ctx() { req }: MyContext
   ): Promise<Book[]> {
-    const books = Book.findBy({ status: status, userId: req.session.userId });
+    const books = Book.find({
+      where: { status: status, userId: req.session.userId },
+      relations: {
+        authors: true,
+        categories: true,
+      },
+    });
     if (!books) {
       throw new GraphQLError("No books found", {
         extensions: {

@@ -19,21 +19,33 @@ export type Scalars = {
   DateTimeISO: { input: any; output: any; }
 };
 
+export type Author = {
+  __typename?: 'Author';
+  books: Array<Book>;
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AuthorInput = {
+  id: Scalars['String']['input'];
+};
+
 export type Book = {
   __typename?: 'Book';
-  author: Scalars['String']['output'];
+  authors: Array<Author>;
+  categories: Array<Category>;
   createdAt: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   finishDate?: Maybe<Scalars['DateTimeISO']['output']>;
-  genre?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  imgSrc: Scalars['String']['output'];
   logs: Array<ReadingLog>;
-  notes?: Maybe<Scalars['String']['output']>;
   pages?: Maybe<Scalars['Float']['output']>;
+  publishDate?: Maybe<Scalars['DateTimeISO']['output']>;
   publisher?: Maybe<Scalars['String']['output']>;
   rating?: Maybe<Scalars['Float']['output']>;
   startDate?: Maybe<Scalars['DateTimeISO']['output']>;
   status: BookStatus;
-  summary?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
   user: User;
@@ -41,16 +53,17 @@ export type Book = {
 };
 
 export type BookInput = {
-  author: Scalars['String']['input'];
+  authors: Array<AuthorInput>;
+  categories: Array<CategoryInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
   finishDate?: InputMaybe<Scalars['String']['input']>;
-  genre?: InputMaybe<Scalars['String']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
+  imgSrc: Scalars['String']['input'];
   pages?: InputMaybe<Scalars['Float']['input']>;
+  publishDate?: InputMaybe<Scalars['String']['input']>;
   publisher?: InputMaybe<Scalars['String']['input']>;
   rating?: InputMaybe<Scalars['Float']['input']>;
   startDate?: InputMaybe<Scalars['String']['input']>;
   status: BookStatus;
-  summary?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
 
@@ -60,6 +73,17 @@ export enum BookStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   NOT_STARTED = 'NOT_STARTED'
 }
+
+export type Category = {
+  __typename?: 'Category';
+  books: Array<Book>;
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type CategoryInput = {
+  id: Scalars['String']['input'];
+};
 
 export type FieldError = {
   __typename?: 'FieldError';
@@ -237,9 +261,9 @@ export type UsernamePasswordInput = {
   username: Scalars['String']['input'];
 };
 
-export type BookFragmentFragment = { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> };
+export type BookFragmentFragment = { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> };
 
-export type LogFragmentFragment = { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } };
+export type LogFragmentFragment = { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } };
 
 export type MinimalErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
@@ -262,7 +286,7 @@ export type CreateBookMutationVariables = Exact<{
 }>;
 
 
-export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, userId: number } };
+export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, userId: number, authors: Array<{ __typename?: 'Author', id: number, name: string }> } };
 
 export type CreateDemoUserMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -274,7 +298,7 @@ export type CreateLogMutationVariables = Exact<{
 }>;
 
 
-export type CreateLogMutation = { __typename?: 'Mutation', createLog: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } };
+export type CreateLogMutation = { __typename?: 'Mutation', createLog: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } };
 
 export type DeleteBookMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -323,7 +347,7 @@ export type UpdateBookMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBookMutation = { __typename?: 'Mutation', updateBook?: { __typename?: 'Book', id: number, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number } | null };
+export type UpdateBookMutation = { __typename?: 'Mutation', updateBook?: { __typename?: 'Book', id: number, title: string, status: BookStatus, publisher?: string | null, publishDate?: any | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }> } | null };
 
 export type UpdateLogMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -331,14 +355,14 @@ export type UpdateLogMutationVariables = Exact<{
 }>;
 
 
-export type UpdateLogMutation = { __typename?: 'Mutation', updateLog?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
+export type UpdateLogMutation = { __typename?: 'Mutation', updateLog?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
 
 export type BookQueryVariables = Exact<{
   id: Scalars['Int']['input'];
 }>;
 
 
-export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> } | null };
+export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> } | null };
 
 export type BooksQueryVariables = Exact<{
   limit: Scalars['Int']['input'];
@@ -346,14 +370,14 @@ export type BooksQueryVariables = Exact<{
 }>;
 
 
-export type BooksQuery = { __typename?: 'Query', books: { __typename?: 'PaginatedBooks', hasMore: boolean, books: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, user: { __typename?: 'User', createdAt: string, email: string, updatedAt: string, id: number, username: string } }> } };
+export type BooksQuery = { __typename?: 'Query', books: { __typename?: 'PaginatedBooks', hasMore: boolean, books: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, user: { __typename?: 'User', createdAt: string, email: string, updatedAt: string, id: number, username: string } }> } };
 
 export type BooksByStatusQueryVariables = Exact<{
   status: BookStatus;
 }>;
 
 
-export type BooksByStatusQuery = { __typename?: 'Query', booksByStatus: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }> };
+export type BooksByStatusQuery = { __typename?: 'Query', booksByStatus: Array<{ __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> }> };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -365,7 +389,7 @@ export type LogQueryVariables = Exact<{
 }>;
 
 
-export type LogQuery = { __typename?: 'Query', log?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, author: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, notes?: string | null, summary?: string | null, genre?: string | null, rating?: number | null, userId: number, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
+export type LogQuery = { __typename?: 'Query', log?: { __typename?: 'ReadingLog', id: number, date: any, bookId: number, userId: number, pagesRead?: number | null, minutes?: number | null, book: { __typename?: 'Book', id: number, createdAt: string, updatedAt: string, title: string, status: BookStatus, publisher?: string | null, pages?: number | null, startDate?: any | null, finishDate?: any | null, description?: string | null, rating?: number | null, userId: number, imgSrc: string, authors: Array<{ __typename?: 'Author', id: number, name: string }>, categories: Array<{ __typename?: 'Category', id: number, name: string }>, logs: Array<{ __typename?: 'ReadingLog', id: number }> }, user: { __typename?: 'User', id: number, createdAt: string, updatedAt: string, username: string, email: string } } | null };
 
 export type UserLogsQueryVariables = Exact<{
   limit: Scalars['Int']['input'];
@@ -386,20 +410,26 @@ export const BookFragmentFragmentDoc = gql`
   createdAt
   updatedAt
   title
-  author
+  authors {
+    id
+    name
+  }
   status
   publisher
   pages
   startDate
   finishDate
-  notes
-  summary
-  genre
+  description
+  categories {
+    id
+    name
+  }
   rating
   userId
   logs {
     id
   }
+  imgSrc
 }
     `;
 export const UserFragmentFragmentDoc = gql`
@@ -492,7 +522,10 @@ export const CreateBookDocument = gql`
     createdAt
     updatedAt
     title
-    author
+    authors {
+      id
+      name
+    }
     status
     userId
   }
@@ -782,15 +815,21 @@ export const UpdateBookDocument = gql`
   updateBook(id: $id, input: $input) {
     id
     title
-    author
+    authors {
+      id
+      name
+    }
     status
     publisher
+    publishDate
     pages
     startDate
     finishDate
-    notes
-    summary
-    genre
+    description
+    categories {
+      id
+      name
+    }
     rating
     userId
   }
@@ -906,14 +945,19 @@ export const BooksDocument = gql`
       createdAt
       updatedAt
       title
-      author
+      authors {
+        id
+        name
+      }
       publisher
       pages
       startDate
       finishDate
-      notes
-      summary
-      genre
+      description
+      categories {
+        id
+        name
+      }
       rating
       userId
       user {
@@ -922,6 +966,7 @@ export const BooksDocument = gql`
         email
         updatedAt
       }
+      imgSrc
     }
   }
 }

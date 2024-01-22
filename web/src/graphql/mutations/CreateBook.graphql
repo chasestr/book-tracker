@@ -4,7 +4,10 @@ mutation CreateBook($input: BookInput!) {
     createdAt
     updatedAt
     title
-    author
+    authors {
+      id
+      name
+    }
     status
     userId
   }

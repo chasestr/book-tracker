@@ -5,6 +5,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +14,9 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { ReadingLog } from "./ReadingLog";
+import { Author } from "./Author";
+import { Category } from "./Category";
+import { imageBackup } from "../constants";
 
 export enum BookStatus {
   NOT_STARTED = "Not_Started",
@@ -38,9 +43,9 @@ export class Book extends BaseEntity {
   @Column()
   title!: string;
 
-  @Field()
-  @Column()
-  author!: string;
+  @Field({ defaultValue: imageBackup })
+  @Column({ default: imageBackup })
+  imgSrc?: string;
 
   @Field(() => BookStatus)
   @Column({
@@ -68,15 +73,11 @@ export class Book extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  notes?: string;
+  description?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  summary?: string;
-
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  genre?: string;
+  publishDate?: Date;
 
   @Field(() => Float, { nullable: true })
   @Column({ nullable: true, type: "float" })
@@ -91,6 +92,23 @@ export class Book extends BaseEntity {
   @JoinColumn({ name: "userId" })
   user: User;
 
-  @OneToMany(() => ReadingLog, (log) => log.book)
+  @Field(() => [ReadingLog])
+  @OneToMany(() => ReadingLog, (log) => log.book, {
+    cascade: true,
+  })
   logs: ReadingLog[];
+
+  @Field(() => [Category])
+  @ManyToMany(() => Category, {
+    cascade: true,
+  })
+  @JoinTable({ name: "book_categories" })
+  categories: Category[];
+
+  @Field(() => [Author])
+  @ManyToMany(() => Author, {
+    cascade: true,
+  })
+  @JoinTable({ name: "book_authors " })
+  authors: Author[];
 }

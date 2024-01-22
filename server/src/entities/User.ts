@@ -37,9 +37,13 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
-  @OneToMany(() => Book, (book) => book.userId)
+  @OneToMany(() => Book, (book) => book.userId, {
+    cascade: true,
+  })
   books: Book[];
 
-  @OneToMany(() => ReadingLog, (log) => log.user)
+  @OneToMany(() => ReadingLog, (log) => log.user, {
+    cascade: true,
+  })
   logs: ReadingLog[];
 }

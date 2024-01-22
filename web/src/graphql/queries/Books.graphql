@@ -6,14 +6,19 @@ query Books($limit: Int!, $cursor: String) {
       createdAt
       updatedAt
       title
-      author
+      authors {
+        id
+        name
+      }
       publisher
       pages
       startDate
       finishDate
-      notes
-      summary
-      genre
+      description
+      categories {
+        id
+        name
+      }
       rating
       userId
       user {
@@ -22,6 +27,7 @@ query Books($limit: Int!, $cursor: String) {
         email
         updatedAt
       }
+      imgSrc
     }
   }
 }

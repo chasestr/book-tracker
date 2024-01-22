@@ -3,18 +3,24 @@ fragment BookFragment on Book {
   createdAt
   updatedAt
   title
-  author
+  authors {
+    id
+    name
+  }
   status
   publisher
   pages
   startDate
   finishDate
-  notes
-  summary
-  genre
+  description
+  categories {
+    id
+    name
+  }
   rating
   userId
   logs {
     id
   }
+  imgSrc
 }

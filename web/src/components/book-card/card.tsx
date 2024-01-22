@@ -3,6 +3,7 @@ import NextLink from "next/link";
 import { Book, useDeleteBookMutation } from "../../generated/graphql";
 import variables from "../../variables.module.scss";
 import { useState } from "react";
+import Image from "next/image";
 
 type BookCardProps = {
   book: Omit<Book, "logs" | "user" | "status">;
@@ -29,14 +30,34 @@ export const BookCard: React.FC<BookCardProps> = (p) => {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <Flex direction="row" alignItems="center">
+      <Flex direction="row" alignItems="center" height={"10em"}>
+        <Box
+          position="relative"
+          height="100%"
+          display="flex"
+          flexShrink={0}
+          mr={2}
+        >
+          <Image
+            src={p.book.imgSrc}
+            alt={"Image not found"}
+            width={0}
+            height={0}
+            sizes="100vw"
+            style={{ height: "100%", width: "auto" }}
+          />
+        </Box>
         <Text
-          fontSize={variables.font_size_xl}
+          fontSize={{
+            base: variables.font_size_2xl,
+            sm: variables.font_size_4xl,
+            md: variables.font_size_6xl,
+          }}
           fontWeight="bold"
           my={2}
           isTruncated
         >
-          {p.book.title} - {p.book.author}
+          {p.book.title} - {p.book.authors.join(", ")}
         </Text>
         {isHovering && (
           <Flex
