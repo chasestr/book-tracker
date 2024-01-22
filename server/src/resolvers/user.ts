@@ -20,6 +20,8 @@ import { v4 } from "uuid";
 import { ds } from "..";
 import { Book } from "../entities/Book";
 import { ReadingLog } from "../entities/ReadingLog";
+import { Author } from "src/entities/Author";
+import { Category } from "src/entities/Category";
 require("express");
 
 @ObjectType()
@@ -49,6 +51,16 @@ export class UserResolver {
   @FieldResolver(() => [ReadingLog])
   logs(@Root() user: User) {
     return ReadingLog.findBy({ userId: user.id });
+  }
+
+  @FieldResolver(() => [Author])
+  authors(@Root() user: User) {
+    return Author.findBy({ userId: user.id });
+  }
+
+  @FieldResolver(() => [Category])
+  categories(@Root() user: User) {
+    return Category.findBy({ userId: user.id });
   }
 
   @Mutation(() => UserResponse)
