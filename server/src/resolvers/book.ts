@@ -51,10 +51,10 @@ export class BookResolver {
     const qb = ds
       .getRepository(Book)
       .createQueryBuilder()
-      .leftJoinAndSelect("book.authors", "authors")
-      .leftJoinAndSelect("book.categories", "categories")
-      .where('"userId" = :id', { id: req.session.userId })
-      .orderBy('"title"', "ASC")
+      .leftJoinAndSelect("Book.authors", "authors")
+      .leftJoinAndSelect("Book.categories", "categories")
+      .where('Book.userId = :id', { id: req.session.userId })
+      .orderBy('Book.title', "ASC")
       .take(realLimit + 1);
     if (cursor) {
       qb.andWhere('"title" > :cursor', { cursor });
