@@ -1,12 +1,12 @@
-import { ds } from "src";
-import { Author } from "src/entities/Author";
-import { authenticate } from "src/middleware/authentication";
-import { MyContext } from "src/types";
+import { AuthorInput } from "../types/AuthorInput";
+import { ds } from "..";
+import { Author } from "../entities/Author";
+import { authenticate } from "../middleware/authentication";
+import { MyContext } from "../types";
 import {
   Arg,
   Ctx,
   Field,
-  InputType,
   Int,
   Mutation,
   ObjectType,
@@ -14,12 +14,6 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-
-@InputType()
-export class AuthorInput {
-  @Field()
-  name: string;
-}
 
 @ObjectType()
 export class PaginatedAuthors {
@@ -87,10 +81,12 @@ export class AuthorResolver {
   @Mutation(() => Author)
   @UseMiddleware(authenticate)
   async createAuthor(
-    @Arg("input") input: AuthorInput
+    @Arg("name", () => String) name: string,
+    @Ctx() { req}: MyContext
   ): Promise<Author> {
     return Author.create({
-      ...input,
+      name,
+      userId: req.session.userId,
     }).save();
   }
 
@@ -98,15 +94,17 @@ export class AuthorResolver {
   @UseMiddleware(authenticate)
   async updateAuthor(
     @Arg("id", () => Int) id: number,
-    @Arg("input") input: AuthorInput
+    @Arg("input") input: AuthorInput,
+    @Ctx() {req}: MyContext
   ): Promise<Author | null> {
     const author = await ds
       .getRepository(Author)
       .createQueryBuilder()
       .update(Author)
       .set({ ...input })
-      .where('id = :id', {
+      .where('id = :id and "userId" = :userId', {
         id,
+        userId: req.session.userId,
       })
       .returning("*")
       .execute();
@@ -118,9 +116,11 @@ export class AuthorResolver {
   @UseMiddleware(authenticate)
   async deleteAuthor(
     @Arg("id", () => Int) id: number,
+    @Ctx() { req }: MyContext
   ): Promise<boolean> {
     const deleted = await Author.delete({
       id,
+      userId: req.session.userId,
     });
     if (!deleted) {
       return false;

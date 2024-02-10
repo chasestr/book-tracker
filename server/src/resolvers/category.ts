@@ -1,12 +1,12 @@
-import { ds } from "src";
-import { Category } from "src/entities/Category";
-import { authenticate } from "src/middleware/authentication";
-import { MyContext } from "src/types";
+import { CategoryInput } from "../types/CategoryInput";
+import { ds } from "..";
+import { Category } from "../entities/Category";
+import { authenticate } from "../middleware/authentication";
+import { MyContext } from "../types";
 import {
   Arg,
   Ctx,
   Field,
-  InputType,
   Int,
   Mutation,
   ObjectType,
@@ -14,12 +14,6 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-
-@InputType()
-export class CategoryInput {
-  @Field()
-  name: string;
-}
 
 @ObjectType()
 export class PaginatedCategory {
@@ -87,10 +81,12 @@ export class CategoryResolver {
   @Mutation(() => Category)
   @UseMiddleware(authenticate)
   async createCategory(
-    @Arg("input") input: CategoryInput
+    @Arg("name", () => String) name: string,
+    @Ctx() { req}: MyContext
   ): Promise<Category> {
     return Category.create({
-      ...input,
+      name,
+      userId: req.session.userId,
     }).save();
   }
 
@@ -98,15 +94,17 @@ export class CategoryResolver {
   @UseMiddleware(authenticate)
   async updateCategory(
     @Arg("id", () => Int) id: number,
-    @Arg("input") input: CategoryInput
+    @Arg("input") input: CategoryInput,
+    @Ctx() { req}: MyContext
   ): Promise<Category | null> {
     const category = await ds
       .getRepository(Category)
       .createQueryBuilder()
       .update(Category)
       .set({ ...input })
-      .where('id = :id', {
+      .where('id = :id and "userId" = :userId', {
         id,
+        userId: req.session.userId,
       })
       .returning("*")
       .execute();
@@ -118,9 +116,11 @@ export class CategoryResolver {
   @UseMiddleware(authenticate)
   async deleteCategory(
     @Arg("id", () => Int) id: number,
+    @Ctx() { req }: MyContext
   ): Promise<boolean> {
     const deleted = await Category.delete({
       id,
+      userId: req.session.userId,
     });
     if (!deleted) {
       return false;
